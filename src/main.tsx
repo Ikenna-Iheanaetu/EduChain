@@ -26,6 +26,7 @@ import MyRequests from "./pages/dashboard/my-requests/page";
 import MyOffers from "./pages/dashboard/my-offers/page";
 import Transactions from "./pages/dashboard/transactions/page";
 import Profile from "./pages/dashboard/profile/page";
+import { Toaster } from "./components/ui/sonner";
 
 const router = createBrowserRouter([
   {
@@ -80,6 +81,7 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <RouterProvider router={router} />
+        <Toaster />
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>

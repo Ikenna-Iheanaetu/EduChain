@@ -20,12 +20,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTopUp } from "@/hooks/topup";
+import { useTransition } from "react";
 
 const formSchema = z.object({
   amount: z.string().min(1, "Amount is required"),
 });
 
 export default function TopUpDialog() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isPending, startTransition] = useTransition();
+  const topUp = useTopUp();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,7 +39,22 @@ export default function TopUpDialog() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    startTransition(() => {
+      topUp.mutate(
+        { amount: Number(values.amount) },
+        {
+          onSuccess: () => {
+            form.reset();
+          },
+          onError: () => {
+            form.setError("amount", {
+              type: "manual",
+              message: "Failed to top up. Please try again.",
+            });
+          },
+        }
+      );
+    });
   }
 
   return (
@@ -75,8 +95,9 @@ export default function TopUpDialog() {
             <Button
               type="submit"
               className="w-full h-12 md:h-10 text-base md:text-sm bg-blue-500 hover:bg-blue-600"
+              disabled={topUp.status === "pending"}
             >
-              Top Up
+              {topUp.status === "pending" ? "Topping up..." : "Top Up"}
             </Button>
           </form>
         </Form>
