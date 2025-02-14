@@ -39,7 +39,7 @@ export const useLogin = () => {
     mutationFn: authApi.login,
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    onSuccess: (data: { token: string; user: User }) => {
+    onSuccess: (_: { token: string; user: User }) => {
       setIsAuthenticated(true);
       toast.success("Logged in successfully!");
       navigate("/dashboard");
