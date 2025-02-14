@@ -8,6 +8,7 @@ import {
 
 type AuthContextType = {
   isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,16 +20,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return !!localStorage.getItem("token");
   });
 
-  //* Check localStorage for authentication status on initial load
+  //* Sync authentication state with localStorage changes
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true);
-    }
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem("token"));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated }}>
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

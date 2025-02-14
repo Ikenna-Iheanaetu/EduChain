@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { User } from "@/types/user";
+import { useAuth } from "@/context/auth-context";
 
 export const useRegister = () => {
   const navigate = useNavigate();
@@ -32,13 +33,14 @@ export const useRegister = () => {
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const { setIsAuthenticated } = useAuth();
 
   return useMutation({
     mutationFn: authApi.login,
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onSuccess: (data: { token: string; user: User }) => {
-        console.log(data)
+      setIsAuthenticated(true);
       toast.success("Logged in successfully!");
       navigate("/dashboard");
     },
