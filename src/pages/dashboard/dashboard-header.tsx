@@ -14,7 +14,7 @@ interface DashboardHeaderProps {
 export default function DashboardHeader({
   setIsSidebarOpen,
 }: DashboardHeaderProps) {
-  const { data: profile} = useProfile();
+  const { data: profile } = useProfile();
 
   const pickAnImage = (imageNumber: number) => {
     switch (imageNumber) {

@@ -8,6 +8,8 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import ArtAndDesignIcon from "@/assets/art-and-design 1.png";
 import PopularityIcon from "@/assets/popularity 1.png";
 import DashboardHeader from "./dashboard-header";
+import CreateCourseDialog from "./create-course-dialog";
+import SendDialog from "./send-dialog";
 
 export default function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -35,12 +37,8 @@ export default function DashboardPage() {
                 Search courses, make request, learn
               </p>
               <div className="flex flex-wrap gap-3">
-                <Button variant="secondary" size="sm" className="text-blue-500">
-                  Send
-                </Button>
-                <Button variant="secondary" size="sm" className="text-blue-500">
-                  Create your course
-                </Button>
+                <SendDialog />
+                <CreateCourseDialog />
               </div>
             </div>
             <BalanceCard />
