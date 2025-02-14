@@ -5,12 +5,41 @@ import { Search } from "lucide-react";
 import { Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useProfile } from "@/hooks/profie";
 
 interface DashboardHeaderProps {
-    setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function DashboardHeader({ setIsSidebarOpen }: DashboardHeaderProps) {
+export default function DashboardHeader({
+  setIsSidebarOpen,
+}: DashboardHeaderProps) {
+  const { data: profile} = useProfile();
+
+  const pickAnImage = (imageNumber: number) => {
+    switch (imageNumber) {
+      case 1:
+        return "/src/assets/avatars/first.png";
+
+      case 2:
+        return "/src/assets/avatars/second.png";
+
+      case 3:
+        return "/src/assets/avatars/third.png";
+
+      case 4:
+        return "/src/assets/avatars/fourth.png";
+
+      case 5:
+        return "/src/assets/avatars/fifth.png";
+
+      case 6:
+        return "/src/assets/avatars/sixth.jpeg";
+
+      default:
+        break;
+    }
+  };
   return (
     <div className="flex items-center justify-between border-b bg-white p-4">
       <div className="lg:hidden">
@@ -32,7 +61,7 @@ export default function DashboardHeader({ setIsSidebarOpen }: DashboardHeaderPro
       <div className="ml-4">
         <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
           <img
-            src="/placeholder.svg"
+            src={pickAnImage(profile?.avatar_number || 1)}
             alt="Samuel"
             className="h-full w-full rounded-full"
           />
