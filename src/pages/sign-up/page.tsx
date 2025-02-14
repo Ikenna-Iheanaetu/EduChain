@@ -1,4 +1,4 @@
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -14,11 +14,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { AuthLayout } from "@/components/auth-layout";
 import { type SignUpValues, signUpSchema } from "@/lib/validations/auth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const [isPending, startTransition] = useTransition();
+  const navigate = useNavigate();
 
+  
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -29,11 +31,27 @@ export default function SignUp() {
       confirmPassword: "",
     },
   });
-
+  
+  useEffect(() => {
+    const savedData = localStorage.getItem("signUpData");
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      form.reset(parsedData);
+    }
+  }, [form]);
+  
   async function onSubmit(data: SignUpValues) {
+    localStorage.setItem("signUpData", JSON.stringify(data));
+
     startTransition(() => {
-      // Handle sign up logic here
-      console.log(data);
+      navigate("/choose-avatar", {
+        state: {
+          email: data.email,
+          password: data.password,
+          firstname: data.firstName,
+          lastname: data.lastName,
+        },
+      });
     });
   }
 

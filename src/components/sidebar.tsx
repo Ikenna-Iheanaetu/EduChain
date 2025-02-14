@@ -12,7 +12,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogoutBg from "@/assets/logout-bg.png";
 
 const navigation = [
@@ -27,6 +27,12 @@ const navigation = [
 
 export default function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
 
   return (
     <aside className="flex h-full w-64 flex-col border-r bg-white">
@@ -56,7 +62,12 @@ export default function Sidebar() {
           className="mb-4 rounded-xl bg-cover bg-center p-4 h-32"
           style={{ backgroundImage: `url(${LogoutBg})` }}
         >
-          <Button variant="secondary" className="w-full mt-auto" size="sm">
+          <Button
+            variant="secondary"
+            className="w-full mt-auto"
+            size="sm"
+            onClick={handleLogout}
+          >
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </Button>

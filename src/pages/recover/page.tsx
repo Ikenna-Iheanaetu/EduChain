@@ -4,14 +4,26 @@ import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { AuthLayout } from "@/components/auth-layout";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Recover() {
   const navigate = useNavigate();
+  const location = useLocation()
   const [confirmed, setConfirmed] = useState(false);
 
+  const phraseData: string = location.state
+
+  if(phraseData === null){
+    return(
+      <AuthLayout>
+        <div className="grid place-content-center">
+          <h4 className="font-bold text-2xl">No phrases available</h4>
+        </div>
+      </AuthLayout>
+    )
+  }
   // In a real app, this would come from your wallet generation service
-  const recoveryPhrase = Array(12).fill("corn");
+  const recoveryPhrase = phraseData.split(" ");
 
   return (
     <AuthLayout>
