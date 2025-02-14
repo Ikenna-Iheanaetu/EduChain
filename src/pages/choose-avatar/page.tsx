@@ -7,14 +7,14 @@ import { AuthLayout } from "@/components/auth-layout";
 import { useLocation } from "react-router-dom";
 import { useRegister } from "@/hooks/auth";
 
-const avatars = [
-  "/src/assets/avatars/first.png",
-  "/src/assets/avatars/second.png",
-  "/src/assets/avatars/third.png",
-  "/src/assets/avatars/fourth.png",
-  "/src/assets/avatars/fifth.png",
-  "/src/assets/avatars/sixth.jpeg",
-];
+import First from "@/assets/avatars/first.png";
+import Second from "@/assets/avatars/second.png";
+import Third from "@/assets/avatars/third.png";
+import Fourth from "@/assets/avatars/fourth.png";
+import Fifth from "@/assets/avatars/fifth.png";
+import Sixth from "@/assets/avatars/sixth.jpeg";
+
+const avatars = [First, Second, Third, Fourth, Fifth, Sixth];
 
 export default function ChooseAvatar() {
   const location = useLocation();

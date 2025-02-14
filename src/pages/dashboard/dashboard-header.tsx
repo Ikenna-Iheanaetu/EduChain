@@ -5,7 +5,14 @@ import { Search } from "lucide-react";
 import { Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useProfile } from "@/hooks/profie";
+import { useProfile } from "@/hooks/profile";
+
+import First from "@/assets/avatars/first.png"
+import Second from "@/assets/avatars/second.png"
+import Third from "@/assets/avatars/third.png"
+import Fourth from "@/assets/avatars/fourth.png"
+import Fifth from "@/assets/avatars/fifth.png"
+import Sixth from "@/assets/avatars/sixth.jpeg"
 
 interface DashboardHeaderProps {
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,22 +26,22 @@ export default function DashboardHeader({
   const pickAnImage = (imageNumber: number) => {
     switch (imageNumber) {
       case 1:
-        return "/src/assets/avatars/first.png";
+        return First;
 
       case 2:
-        return "/src/assets/avatars/second.png";
+        return Second;
 
       case 3:
-        return "/src/assets/avatars/third.png";
+        return Third;
 
       case 4:
-        return "/src/assets/avatars/fourth.png";
+        return Fourth;
 
       case 5:
-        return "/src/assets/avatars/fifth.png";
+        return Fifth;
 
       case 6:
-        return "/src/assets/avatars/sixth.jpeg";
+        return Sixth;
 
       default:
         break;

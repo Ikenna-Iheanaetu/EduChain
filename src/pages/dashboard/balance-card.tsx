@@ -1,7 +1,7 @@
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useProfile } from "@/hooks/profie";
+import { useProfile } from "@/hooks/profile";
 import { useState } from "react";
 import TopUpDialog from "./top-up-dialog";
 

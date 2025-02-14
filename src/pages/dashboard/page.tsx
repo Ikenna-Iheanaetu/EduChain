@@ -12,6 +12,7 @@ import CreateCourseDialog from "./create-course-dialog";
 import SendDialog from "./send-dialog";
 import { useGetLatestCourses, useGetPoplarCourses } from "@/hooks/course";
 import { CoursesProps } from "@/types/course";
+import { useProfile } from "@/hooks/profile";
 
 export default function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,12 +20,17 @@ export default function DashboardPage() {
 
   const { data: latestCourses } = useGetLatestCourses();
   const { data: popularCourses } = useGetPoplarCourses();
+  const { data: profile } = useProfile();
 
-  console.table(latestCourses)
-
-  // Determine which data to display based on the selected view type
+  //* Determine which data to display based on the selected view type
   const displayedCourses =
     viewType === "popular" ? popularCourses?.courses : latestCourses?.courses;
+
+  const getVariantForCourse = (course: CoursesProps) => {
+    const variants = ["blue", "beige", "mint"];
+    const index = course.courseid.charCodeAt(0) % variants.length;
+    return variants[index] as "blue" | "beige" | "mint";
+  };
 
   return (
     <DashboardLayout>
@@ -44,7 +50,9 @@ export default function DashboardPage() {
           {/* Welcome Section */}
           <div className="grid gap-4 lg:grid-cols-[1fr,300px]">
             <div className="rounded-xl bg-blue-500 p-6 text-white">
-              <h1 className="text-2xl font-bold mb-2">Welcome, Samuel</h1>
+              <h1 className="text-2xl font-bold mb-2">
+                Welcome, {profile?.firstname}
+              </h1>
               <p className="text-blue-100 mb-4 text-sm">
                 Search courses, make request, learn
               </p>
@@ -60,10 +68,14 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">All Tutors</h2>
-              <span className="text-sm text-gray-500">244 items</span>
+              <span className="text-sm text-gray-500">
+                {(latestCourses?.courses.length ?? 0) +
+                  (popularCourses?.courses.length ?? 0)}{" "}
+                items
+              </span>
             </div>
 
-            {/* Toggle between Popular and Latest */}
+            {/* Toggle between Popular and Latest  */}
             <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
               <Button
                 variant={viewType === "popular" ? "default" : "outline"}
@@ -90,7 +102,7 @@ export default function DashboardPage() {
               {displayedCourses?.map((course) => (
                 <ServiceCard
                   key={course.courseid}
-                  variant={getVariantForCourse(course)} // Dynamically set the variant
+                  variant={getVariantForCourse(course)}
                   title={course.course_name}
                   author={course.tutor_name}
                   authorId={course.tutor_id}
@@ -105,9 +117,3 @@ export default function DashboardPage() {
     </DashboardLayout>
   );
 }
-
-const getVariantForCourse = (course: CoursesProps) => {
-  const variants = ["blue", "beige", "mint"];
-  const index = course.courseid.charCodeAt(0) % variants.length;
-  return variants[index] as "blue" | "beige" | "mint";
-};
