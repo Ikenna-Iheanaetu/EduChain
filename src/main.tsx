@@ -4,6 +4,7 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import { AuthProvider } from "./context/auth-context";
 const queryClient = new QueryClient();
 
 // Pages
@@ -15,6 +16,10 @@ import Recover from "./pages/recover/page";
 import ChooseAvatar from "./pages/choose-avatar/page";
 
 // Dashboard Pages
+
+// ProtectedRoutes
+import ProtectedRoute from "./components/protected-route";
+
 import Dashboard from "./pages/dashboard/page";
 import FindTutors from "./pages/dashboard/find-tutors/page";
 import MyRequests from "./pages/dashboard/my-requests/page";
@@ -40,35 +45,42 @@ const router = createBrowserRouter([
     element: <ChooseAvatar />,
   },
   {
-    path: "/dashboard",
-    element: <Dashboard />,
-  },
-  {
-    path: "dashboard/find-tutors",
-    element: <FindTutors />,
-  },
-  {
-    path: "dashboard/my-requests",
-    element: <MyRequests />,
-  },
-  {
-    path: "dashboard/my-offers",
-    element: <MyOffers />,
-  },
-  {
-    path: "dashboard/transactions",
-    element: <Transactions />,
-  },
-  {
-    path: "dashboard/profile",
-    element: <Profile />,
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "dashboard/find-tutors",
+        element: <FindTutors />,
+      },
+      {
+        path: "dashboard/my-requests",
+        element: <MyRequests />,
+      },
+      {
+        path: "dashboard/my-offers",
+        element: <MyOffers />,
+      },
+      {
+        path: "dashboard/transactions",
+        element: <Transactions />,
+      },
+      {
+        path: "dashboard/profile",
+        element: <Profile />,
+      },
+    ],
   },
 ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </QueryClientProvider>
   </StrictMode>
 );
