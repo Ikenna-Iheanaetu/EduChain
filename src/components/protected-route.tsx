@@ -6,7 +6,7 @@ export default function ProtectedRoute() {
   const { isAuthenticated } = useAuth();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [authState, setAuthState] = useState(isAuthenticated);
+  const [_, setAuthState] = useState(isAuthenticated);
 
   useEffect(() => {
     setAuthState(isAuthenticated);

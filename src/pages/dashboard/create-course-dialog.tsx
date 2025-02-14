@@ -41,7 +41,7 @@ const formSchema = z.object({
 export default function CreateCourseDialog() {
   const createCourse = useCreateCourse();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [pending, startTransaction] = useTransition();
+  const [_, startTransaction] = useTransition();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

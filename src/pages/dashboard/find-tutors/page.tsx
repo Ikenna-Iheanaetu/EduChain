@@ -12,7 +12,7 @@ import DashboardHeader from "../dashboard-header";
 const tutors = Array(9)
   .fill(null)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  .map((_, i) => ({
+  .map((_,) => ({
     title: "Web Development",
     author: "Samuel David",
     authorId: "sjjbjfbjofbehfwbvfbwevbwjbv",

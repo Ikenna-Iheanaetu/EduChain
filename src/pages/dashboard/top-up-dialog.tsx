@@ -29,7 +29,7 @@ const formSchema = z.object({
 
 export default function TopUpDialog() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isPending, startTransition] = useTransition();
+  const [_, startTransition] = useTransition();
   const topUp = useTopUp();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

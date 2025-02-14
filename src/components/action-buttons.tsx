@@ -8,7 +8,7 @@ interface ActionButtonsProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function ActionButtons({ status, onAccept, onReject, onComplete }: ActionButtonsProps) {
+export default function ActionButtons({ status }: ActionButtonsProps) {
   if (status === "pending") {
     return (
       <div className="flex gap-2">
