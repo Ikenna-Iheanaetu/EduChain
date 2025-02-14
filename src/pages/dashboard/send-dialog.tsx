@@ -20,6 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useSend } from "@/hooks/send";
+import { useTransition } from "react";
 
 const formSchema = z.object({
   address: z.string().min(1, "Address is required"),
@@ -27,6 +29,9 @@ const formSchema = z.object({
 });
 
 export default function SendDialog() {
+  const send = useSend();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, startTransition] = useTransition();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,7 +41,12 @@ export default function SendDialog() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    startTransition(() => {
+      send.mutate({
+        receiver_address: values.address,
+        amount: Number(values.price),
+      });
+    });
   }
 
   return (
@@ -106,10 +116,16 @@ export default function SendDialog() {
               <Button
                 type="submit"
                 className="h-12 sm:h-10 text-base sm:text-sm w-full sm:w-auto order-1 sm:order-2 bg-blue-500 hover:bg-blue-600"
+                disabled={send.status === "pending"}
               >
-                Send
+                {send.status === "pending" ? "Sending..." : " Send"}
               </Button>
             </div>
+            {send.error && (
+              <p className="text-sm font-medium text-red-500 text-center">
+                {send.error.response?.data?.error}
+              </p>
+            )}
           </form>
         </Form>
       </DialogContent>
