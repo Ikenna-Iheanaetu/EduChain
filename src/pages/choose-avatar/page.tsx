@@ -30,7 +30,7 @@ export default function ChooseAvatar() {
 
     register.mutate({
       ...registrationData,
-      avatar_number: selectedAvatar,
+      avatar_number: selectedAvatar + 1,
     });
   };
 
@@ -49,7 +49,7 @@ export default function ChooseAvatar() {
                 "relative aspect-square overflow-hidden rounded-full border-2 border-transparent transition-all hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 selectedAvatar === index && "border-primary"
               )}
-              onClick={() => setSelectedAvatar(index + 1)}
+              onClick={() => setSelectedAvatar(index)}
             >
               <img
                 src={avatar || "/placeholder.svg"}
