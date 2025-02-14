@@ -27,15 +27,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { useCreateCourse } from "@/hooks/course";
+import { useTransition } from "react";
 
 const formSchema = z.object({
   colorCard: z.string().min(1, "Please select a color"),
   courseName: z.string().min(1, "Course name is required"),
   duration: z.string().min(1, "Duration is required"),
   price: z.string().min(1, "Price is required"),
+  maxRequests: z.string().min(1, "Max Requests is required"),
 });
 
 export default function CreateCourseDialog() {
+  const createCourse = useCreateCourse();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [pending, startTransaction] = useTransition();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,11 +49,25 @@ export default function CreateCourseDialog() {
       courseName: "",
       duration: "",
       price: "",
+      maxRequests: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    startTransaction(() => {
+      createCourse.mutate({
+        course_name: values.courseName,
+        price: Number(values.price),
+        duration: Number(values.duration),
+        color:
+          values.colorCard === "blue"
+            ? "#F0F7FF"
+            : values.colorCard === "green"
+            ? "#F0FFF4"
+            : "#FFFAF0",
+        max_requests: Number(values.maxRequests),
+      });
+    });
   }
 
   return (
@@ -121,11 +141,8 @@ export default function CreateCourseDialog() {
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                        $
-                      </span>
                       <Input
-                        className="pl-6 h-12 md:h-10 text-base md:text-sm"
+                        className="h-12 md:h-10 text-base md:text-sm"
                         placeholder="enter duration"
                         {...field}
                       />
@@ -157,6 +174,27 @@ export default function CreateCourseDialog() {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="maxRequests"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm md:text-base">
+                    Max Requests
+                  </FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        className="pl-6 h-12 md:h-10 text-base md:text-sm"
+                        placeholder="0.899"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
+            />
             <div className="flex flex-col sm:flex-row justify-end gap-2 pt-2">
               <DialogTrigger asChild>
                 <Button
@@ -171,9 +209,16 @@ export default function CreateCourseDialog() {
                 type="submit"
                 className="h-12 sm:h-10 text-base sm:text-sm w-full sm:w-auto order-1 sm:order-2 bg-blue-500 hover:bg-blue-600"
               >
-                Create
+                {createCourse.status === "pending"
+                  ? "Creating course...."
+                  : "Create"}
               </Button>
             </div>
+            {createCourse.error && (
+              <p className="text-sm font-medium text-red-500 text-center">
+                {createCourse.error.response?.data?.error}
+              </p>
+            )}
           </form>
         </Form>
       </DialogContent>

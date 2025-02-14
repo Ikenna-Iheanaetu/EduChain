@@ -10,9 +10,21 @@ import PopularityIcon from "@/assets/popularity 1.png";
 import DashboardHeader from "./dashboard-header";
 import CreateCourseDialog from "./create-course-dialog";
 import SendDialog from "./send-dialog";
+import { useGetLatestCourses, useGetPoplarCourses } from "@/hooks/course";
+import { CoursesProps } from "@/types/course";
 
 export default function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [viewType, setViewType] = useState<"popular" | "latest">("popular"); // State to track view type
+
+  const { data: latestCourses } = useGetLatestCourses();
+  const { data: popularCourses } = useGetPoplarCourses();
+
+  console.table(latestCourses)
+
+  // Determine which data to display based on the selected view type
+  const displayedCourses =
+    viewType === "popular" ? popularCourses?.courses : latestCourses?.courses;
 
   return (
     <DashboardLayout>
@@ -51,32 +63,41 @@ export default function DashboardPage() {
               <span className="text-sm text-gray-500">244 items</span>
             </div>
 
+            {/* Toggle between Popular and Latest */}
             <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
               <Button
-                variant="outline"
+                variant={viewType === "popular" ? "default" : "outline"}
                 size="sm"
                 className="gap-2 whitespace-nowrap"
+                onClick={() => setViewType("popular")}
               >
                 <img src={PopularityIcon} alt="" className="h-4 w-4" />
                 Popular
               </Button>
               <Button
-                variant="outline"
+                variant={viewType === "latest" ? "default" : "outline"}
                 size="sm"
                 className="gap-2 whitespace-nowrap"
+                onClick={() => setViewType("latest")}
               >
                 <img src={ArtAndDesignIcon} alt="" className="h-4 w-4" />
                 Latest
               </Button>
             </div>
 
+            {/* Display Courses */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <ServiceCard variant="blue" />
-              <ServiceCard variant="beige" />
-              <ServiceCard variant="mint" />
-              <ServiceCard variant="blue" />
-              <ServiceCard variant="beige" />
-              <ServiceCard variant="mint" />
+              {displayedCourses?.map((course) => (
+                <ServiceCard
+                  key={course.courseid}
+                  variant={getVariantForCourse(course)} // Dynamically set the variant
+                  title={course.course_name}
+                  author={course.tutor_name}
+                  authorId={course.tutor_id}
+                  price={`${course.price} VC`}
+                  duration={`${course.duration} hours`}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -84,3 +105,9 @@ export default function DashboardPage() {
     </DashboardLayout>
   );
 }
+
+const getVariantForCourse = (course: CoursesProps) => {
+  const variants = ["blue", "beige", "mint"];
+  const index = course.courseid.charCodeAt(0) % variants.length;
+  return variants[index] as "blue" | "beige" | "mint";
+};
