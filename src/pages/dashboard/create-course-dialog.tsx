@@ -62,7 +62,7 @@ export default function CreateCourseDialog() {
         color:
           values.colorCard === "blue"
             ? "#F0F7FF"
-            : values.colorCard === "green"
+            : values.colorCard === "beige"
             ? "#F0FFF4"
             : "#FFFAF0",
         max_requests: Number(values.maxRequests),
@@ -104,8 +104,8 @@ export default function CreateCourseDialog() {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="blue">Blue</SelectItem>
-                      <SelectItem value="green">Green</SelectItem>
-                      <SelectItem value="red">Red</SelectItem>
+                      <SelectItem value="beige">Beige</SelectItem>
+                      <SelectItem value="mint">Mint</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage className="text-sm" />

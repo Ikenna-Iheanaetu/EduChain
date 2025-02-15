@@ -11,12 +11,12 @@ import DashboardHeader from "./dashboard-header";
 import CreateCourseDialog from "./create-course-dialog";
 import SendDialog from "./send-dialog";
 import { useGetLatestCourses, useGetPoplarCourses } from "@/hooks/course";
-import { CoursesProps } from "@/types/course";
 import { useProfile } from "@/hooks/profile";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [viewType, setViewType] = useState<"popular" | "latest">("popular"); // State to track view type
+  const [viewType, setViewType] = useState<"popular" | "latest">("popular"); //* State to track view type
 
   const { data: latestCourses } = useGetLatestCourses();
   const { data: popularCourses } = useGetPoplarCourses();
@@ -26,10 +26,12 @@ export default function DashboardPage() {
   const displayedCourses =
     viewType === "popular" ? popularCourses?.courses : latestCourses?.courses;
 
-  const getVariantForCourse = (course: CoursesProps) => {
-    const variants = ["blue", "beige", "mint"];
-    const index = course.courseid.charCodeAt(0) % variants.length;
-    return variants[index] as "blue" | "beige" | "mint";
+  const getVariantForCourse = (courseColor: string) => {
+    return courseColor === "#F0F7FF"
+      ? "blue"
+      : courseColor === "#FFFAF0"
+      ? "beige"
+      : "mint";
   };
 
   return (
@@ -78,18 +80,24 @@ export default function DashboardPage() {
             {/* Toggle between Popular and Latest  */}
             <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
               <Button
-                variant={viewType === "popular" ? "default" : "outline"}
+                variant="outline"
                 size="sm"
-                className="gap-2 whitespace-nowrap"
+                className={cn(
+                  "gap-2",
+                  viewType === "popular" && "bg-blue-50 border-blue-200"
+                )}
                 onClick={() => setViewType("popular")}
               >
                 <img src={PopularityIcon} alt="" className="h-4 w-4" />
                 Popular
               </Button>
               <Button
-                variant={viewType === "latest" ? "default" : "outline"}
+                variant="outline"
                 size="sm"
-                className="gap-2 whitespace-nowrap"
+                className={cn(
+                  "gap-2",
+                  viewType === "latest" && "bg-blue-50 border-blue-200"
+                )}
                 onClick={() => setViewType("latest")}
               >
                 <img src={ArtAndDesignIcon} alt="" className="h-4 w-4" />
@@ -102,7 +110,7 @@ export default function DashboardPage() {
               {displayedCourses?.map((course) => (
                 <ServiceCard
                   key={course.courseid}
-                  variant={getVariantForCourse(course)}
+                  variant={getVariantForCourse(course.color)}
                   title={course.course_name}
                   author={course.tutor_name}
                   authorId={course.tutor_id}

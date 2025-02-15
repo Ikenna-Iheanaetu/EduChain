@@ -8,24 +8,30 @@ import { cn } from "@/lib/utils";
 import ArtAndDesignIcon from "@/assets/art-and-design 1.png";
 import PopularityIcon from "@/assets/popularity 1.png";
 import DashboardHeader from "../dashboard-header";
-
-const tutors = Array(9)
-  .fill(null)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  .map((_,) => ({
-    title: "Web Development",
-    author: "Samuel David",
-    authorId: "sjjbjfbjofbehfwbvfbwevbwjbv",
-    price: "0.24 VC",
-    duration: "1 hour",
-  }));
+import { useGetLatestCourses, useGetPoplarCourses } from "@/hooks/course";
 
 export default function FindTutors() {
-  const [activeFilter, setActiveFilter] = useState("popular");
+  const { data: latestCourses } = useGetLatestCourses();
+  const { data: popularCourses } = useGetPoplarCourses();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [viewType, setViewType] = useState<"popular" | "latest">("popular"); //* State to track view type
+
+  //* Determine which data to display based on the selected view type
+  const displayedCourses =
+    viewType === "popular" ? popularCourses?.courses : latestCourses?.courses;
+
+  const getVariantForCourse = (courseColor: string) => {
+    return courseColor === "#F0F7FF"
+      ? "blue"
+      : courseColor === "#FFFAF0"
+      ? "beige"
+      : "mint";
+  };
 
   return (
     <DashboardLayout>
+      z
       <div className="hidden lg:block">
         <Sidebar />
       </div>
@@ -34,7 +40,6 @@ export default function FindTutors() {
           <Sidebar />
         </SheetContent>
       </Sheet>
-
       <main className="flex-1 overflow-auto bg-white">
         {/* Header */}
         <DashboardHeader setIsSidebarOpen={setIsSidebarOpen} />
@@ -44,7 +49,11 @@ export default function FindTutors() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-semibold">All Tutors</h1>
-              <span className="text-sm text-gray-500">244 items</span>
+              <span className="text-sm text-gray-500">
+                {(latestCourses?.courses.length ?? 0) +
+                  (popularCourses?.courses.length ?? 0)}{" "}
+                items
+              </span>
             </div>
           </div>
 
@@ -55,9 +64,9 @@ export default function FindTutors() {
               size="sm"
               className={cn(
                 "gap-2",
-                activeFilter === "popular" && "bg-blue-50 border-blue-200"
+                viewType === "popular" && "bg-blue-50 border-blue-200"
               )}
-              onClick={() => setActiveFilter("popular")}
+              onClick={() => setViewType("popular")}
             >
               <img src={PopularityIcon} alt="" className="h-4 w-4" />
               Popular
@@ -67,9 +76,9 @@ export default function FindTutors() {
               size="sm"
               className={cn(
                 "gap-2",
-                activeFilter === "latest" && "bg-blue-50 border-blue-200"
+                viewType === "latest" && "bg-blue-50 border-blue-200"
               )}
-              onClick={() => setActiveFilter("latest")}
+              onClick={() => setViewType("latest")}
             >
               <img src={ArtAndDesignIcon} alt="" className="h-4 w-4" />
               Latest
@@ -78,13 +87,15 @@ export default function FindTutors() {
 
           {/* Tutors Grid */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {tutors.map((tutor, index) => (
+            {displayedCourses?.map((course, index) => (
               <ServiceCard
                 key={index}
-                variant={
-                  index % 3 === 0 ? "blue" : index % 3 === 1 ? "beige" : "mint"
-                }
-                {...tutor}
+                variant={getVariantForCourse(course.color)}
+                title={course.course_name}
+                author={course.tutor_name}
+                authorId={course.tutor_id}
+                price={`${course.price} VC`}
+                duration={`${course.duration} hours`}
               />
             ))}
           </div>

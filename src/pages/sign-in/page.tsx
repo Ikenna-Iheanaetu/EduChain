@@ -14,11 +14,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { AuthLayout } from "@/components/auth-layout";
 import { type SignInValues, signInSchema } from "@/lib/validations/auth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLogin } from "@/hooks/auth";
 
 export default function SignIn() {
   const [isPending, startTransition] = useTransition();
+  const navigate = useNavigate();
   const login = useLogin();
 
   const form = useForm<SignInValues>({
@@ -82,9 +83,23 @@ export default function SignIn() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Signing in..." : "Sign in"}
-            </Button>
+            {localStorage.getItem("token") ? (
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => navigate("/dashboard")}
+              >
+                Go to dashboard
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={login.status === "pending"}
+              >
+                {login.status === "pending" ? "Signing in..." : "Sign in"}
+              </Button>
+            )}
           </form>
         </Form>
         <div className="text-center">
