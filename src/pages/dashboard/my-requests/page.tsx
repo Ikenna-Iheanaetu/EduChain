@@ -1,13 +1,19 @@
-"use client"
-
-import { useState } from "react"
-import DashboardLayout from "@/pages/dashboard/dashboard-layout"
-import Sidebar from "@/components/sidebar"
-import StatusBadge from "@/components/status-badge"
-import ActionButton from "@/components/action-button"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import DashboardHeader from "../dashboard-header"
+import { useState } from "react";
+import DashboardLayout from "@/pages/dashboard/dashboard-layout";
+import Sidebar from "@/components/sidebar";
+import StatusBadge from "@/components/status-badge";
+import ActionButton from "@/components/action-button";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import DashboardHeader from "../dashboard-header";
+import { useGetMyRequests } from "@/hooks/my-requests";
 
 const requests = [
   {
@@ -64,10 +70,13 @@ const requests = [
     status: "accepted" as const,
     action: "Complete" as const,
   },
-]
+];
 
 export default function MyRequests() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { data: mrequests } = useGetMyRequests()
+
+  console.log(mrequests)
 
   return (
     <DashboardLayout>
@@ -104,11 +113,15 @@ export default function MyRequests() {
               <TableBody>
                 {requests.map((request, index) => (
                   <TableRow key={index} className="hover:bg-gray-50">
-                    <TableCell className="font-medium">{request.courseName}</TableCell>
+                    <TableCell className="font-medium">
+                      {request.courseName}
+                    </TableCell>
                     <TableCell>
                       <div>
                         <p>{request.tutorName}</p>
-                        <p className="text-gray-500 text-xs">{request.tutorId}</p>
+                        <p className="text-gray-500 text-xs">
+                          {request.tutorId}
+                        </p>
                       </div>
                     </TableCell>
                     <TableCell>{request.price}</TableCell>
@@ -128,10 +141,15 @@ export default function MyRequests() {
           {/* Mobile Card View */}
           <div className="space-y-4 md:hidden">
             {requests.map((request, index) => (
-              <div key={index} className="rounded-lg border border-gray-200 p-4 space-y-3">
+              <div
+                key={index}
+                className="rounded-lg border border-gray-200 p-4 space-y-3"
+              >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-medium text-gray-900">{request.courseName}</p>
+                    <p className="font-medium text-gray-900">
+                      {request.courseName}
+                    </p>
                     <p className="text-sm text-gray-500">{request.tutorName}</p>
                     <p className="text-xs text-gray-500">{request.tutorId}</p>
                   </div>
@@ -156,6 +174,5 @@ export default function MyRequests() {
         </div>
       </main>
     </DashboardLayout>
-  )
+  );
 }
-

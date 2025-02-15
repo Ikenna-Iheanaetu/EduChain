@@ -21,8 +21,8 @@ export default function Transactions() {
   console.log(transactions);
 
   const formatTimestamp = (timestamp: number) => {
-    const date = new Date(timestamp * 1000); // Convert from seconds to milliseconds
-    return format(date, "PPpp"); // Example format: "Jan 1, 2025 at 10:30 AM"
+    const date = new Date(timestamp * 1000); 
+    return format(date, "PPpp")
   };
 
   return (
@@ -50,13 +50,13 @@ export default function Transactions() {
               <TableHeader>
                 <TableRow className="bg-gray-50 hover:bg-gray-50">
                   <TableHead className="font-medium">Transaction ID</TableHead>
-                  <TableHead className="font-medium">block hash</TableHead>
+                  <TableHead className="font-medium">Block hash</TableHead>
                   {/* <TableHead className="font-medium">fee</TableHead> */}
-                  <TableHead className="font-medium">gas fee</TableHead>
+                  <TableHead className="font-medium">Gas fee</TableHead>
                   {/* <TableHead className="font-medium">Index</TableHead> */}
                   <TableHead className="font-medium">Status</TableHead>
-                  <TableHead className="font-medium">nonce</TableHead>
-                  <TableHead className="font-medium">time</TableHead>
+                  <TableHead className="font-medium">Nonce</TableHead>
+                  <TableHead className="font-medium">Time</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

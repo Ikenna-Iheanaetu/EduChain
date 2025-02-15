@@ -16,9 +16,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DashboardHeader from "../dashboard-header";
+import { useGetMyOffers } from "@/hooks/my-offers";
+
+// Add courseId to the offers type
 
 const offers = [
   {
+    courseId: "course-1", // Added courseId
     title: "Web Development",
     author: "Samuel David",
     authorId: "sjjbjfbjofbehfwbvfbwevbwjbv",
@@ -26,6 +30,7 @@ const offers = [
     duration: "1 hour",
   },
   {
+    courseId: "course-2", // Added courseId
     title: "Web Development",
     author: "Samuel David",
     authorId: "sjjbjfbjofbehfwbvfbwevbwjbv",
@@ -33,6 +38,7 @@ const offers = [
     duration: "1 hour",
   },
   {
+    courseId: "course-3", // Added courseId
     title: "Web Development",
     author: "Samuel David",
     authorId: "sjjbjfbjofbehfwbvfbwevbwjbv",
@@ -75,6 +81,9 @@ const requests = [
 export default function MyOffers() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<number | null>(null);
+
+  const { data: myOffers } = useGetMyOffers()
+  console.log(myOffers)
 
   return (
     <DashboardLayout>

@@ -3,7 +3,7 @@ import { authApi } from "@/api/auth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-import { User } from "@/types/user";
+import { User } from "@/types/user.types";
 import { useAuth } from "@/context/auth-context";
 
 export const useRegister = () => {

@@ -10,3 +10,7 @@ export interface User {
     wallet_address: string
     wallet_balance: number
 }
+
+export type UserReturnType  = {
+    user: User
+}

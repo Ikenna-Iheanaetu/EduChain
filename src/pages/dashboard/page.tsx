@@ -13,11 +13,14 @@ import SendDialog from "./send-dialog";
 import { useGetLatestCourses, useGetPoplarCourses } from "@/hooks/course";
 import { useProfile } from "@/hooks/profile";
 import { cn } from "@/lib/utils";
+import { useCreateCourseRequest } from "@/hooks/my-requests";
 
 export default function DashboardPage() {
+  const [loadingCourseId, setLoadingCourseId] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [viewType, setViewType] = useState<"popular" | "latest">("popular"); //* State to track view type
 
+  const makeCourseRequest = useCreateCourseRequest();
   const { data: latestCourses } = useGetLatestCourses();
   const { data: popularCourses } = useGetPoplarCourses();
   const { data: profile } = useProfile();
@@ -32,6 +35,21 @@ export default function DashboardPage() {
       : courseColor === "#FFFAF0"
       ? "beige"
       : "mint";
+  };
+
+  const handleMakeCourseRequest = async (courseId: string) => {
+    setLoadingCourseId(courseId);
+    try {
+      await makeCourseRequest.mutateAsync(courseId);
+    } finally {
+      setLoadingCourseId(null);
+    }
+  };
+
+  const onAction = (mode: "request" | "offer", courseId?: string) => {
+    if (mode === "request") {
+      handleMakeCourseRequest(courseId!);
+    }
   };
 
   return (
@@ -110,12 +128,15 @@ export default function DashboardPage() {
               {displayedCourses?.map((course) => (
                 <ServiceCard
                   key={course.courseid}
+                  courseId={course.courseid}
                   variant={getVariantForCourse(course.color)}
                   title={course.course_name}
                   author={course.tutor_name}
                   authorId={course.tutor_id}
                   price={`${course.price} VC`}
                   duration={`${course.duration} hours`}
+                  onAction={onAction}
+                  loadingCourseId={loadingCourseId}
                 />
               ))}
             </div>

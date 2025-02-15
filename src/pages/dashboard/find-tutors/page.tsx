@@ -31,7 +31,6 @@ export default function FindTutors() {
 
   return (
     <DashboardLayout>
-      z
       <div className="hidden lg:block">
         <Sidebar />
       </div>

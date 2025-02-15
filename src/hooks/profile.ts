@@ -1,5 +1,5 @@
 import { profileApi } from "@/api/profile";
-import { User } from "@/types/user";
+import { User } from "@/types/user.types";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 

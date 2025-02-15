@@ -1,5 +1,5 @@
 import { courseApi } from "@/api/course";
-import { CoursesProps } from "@/types/course";
+import { CoursesProps } from "@/types/course.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { toast } from "sonner";

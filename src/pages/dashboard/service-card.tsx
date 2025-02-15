@@ -1,36 +1,48 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Trash2 } from 'lucide-react'
-import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ServiceCardProps {
-  variant?: "blue" | "beige" | "mint"
-  title?: string
-  author?: string
-  authorId?: string
-  price?: string
-  duration?: string
-  mode?: "request" | "offer"
-  onDelete?: () => void
-  onAction?: () => void
+  courseId: string;
+  variant?: "blue" | "beige" | "mint";
+  title?: string;
+  author?: string;
+  authorId?: string;
+  price?: string;
+  duration?: string;
+  mode?: "request" | "offer";
+  onDelete?: () => void;
+  onAction?: (mode: "request" | "offer", courseId?: string) => void;
+  isLoading?: boolean;
+  loadingCourseId?: string | null;
 }
 
 export default function ServiceCard({
+  courseId,
   variant = "blue",
   title = "Web Development",
   author = "Samuel David",
-  authorId = "sjjbjfbjofbehfwbvfbwevbwjbv",
+  authorId = "dkmdkd03944in494949",
   price = "0.24 VC",
   duration = "1 hour",
   mode = "request",
   onDelete,
-  onAction
+  onAction,
+  loadingCourseId = null,
 }: ServiceCardProps) {
   const bgColors = {
     blue: "bg-[#F0F7FF]",
     beige: "bg-[#FFFAF0]",
-    mint: "bg-[#F0FFF4]"
-  }
+    mint: "bg-[#F0FFF4]",
+  };
+
+  const isLoading = loadingCourseId === courseId;
+  const handleAction = () => {
+    if (onAction) {
+      onAction(mode, courseId);
+    }
+  };
 
   return (
     <Card className={`${bgColors[variant]} border-none`}>
@@ -52,17 +64,22 @@ export default function ServiceCard({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button 
+            <Button
               className={cn(
                 "flex-1 font-medium",
-                mode === "offer" 
-                  ? "bg-[#0095FF] hover:bg-blue-500 text-white" 
+                mode === "offer"
+                  ? "bg-[#0095FF] hover:bg-blue-500 text-white"
                   : "bg-[#0095FF] hover:bg-blue-600 text-white"
               )}
               size="sm"
-              onClick={onAction}
+              onClick={handleAction}
+              disabled={isLoading}
             >
-              {mode === "offer" ? "View Requests" : "Request Service"}
+              {mode === "offer"
+                ? "View Requests"
+                : isLoading
+                ? "Requesting Service..."
+                : "Request Service"}
             </Button>
             {mode === "offer" && (
               <Button
@@ -78,5 +95,5 @@ export default function ServiceCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
