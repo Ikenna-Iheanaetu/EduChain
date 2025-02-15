@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "./components/ui/sonner";
 
 import { AuthProvider } from "./context/auth-context";
 const queryClient = new QueryClient();
@@ -26,7 +27,7 @@ import MyRequests from "./pages/dashboard/my-requests/page";
 import MyOffers from "./pages/dashboard/my-offers/page";
 import Transactions from "./pages/dashboard/transactions/page";
 import Profile from "./pages/dashboard/profile/page";
-import { Toaster } from "./components/ui/sonner";
+import Messages from "./pages/dashboard/messages/page";
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
       {
         path: "dashboard/my-requests",
         element: <MyRequests />,
+      },
+      {
+        path: "dashboard/messages",
+        element: <Messages />
       },
       {
         path: "dashboard/my-offers",

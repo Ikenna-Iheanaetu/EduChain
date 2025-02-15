@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetTransactions } from "@/hooks/transactions";
-import { format } from "date-fns"
+import { format } from "date-fns";
 
 export default function Transactions() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,8 +21,8 @@ export default function Transactions() {
   console.log(transactions);
 
   const formatTimestamp = (timestamp: number) => {
-    const date = new Date(timestamp * 1000); 
-    return format(date, "PPpp")
+    const date = new Date(timestamp * 1000);
+    return format(date, "PPpp");
   };
 
   return (
@@ -50,10 +50,12 @@ export default function Transactions() {
               <TableHeader>
                 <TableRow className="bg-gray-50 hover:bg-gray-50">
                   <TableHead className="font-medium">Transaction ID</TableHead>
-                  <TableHead className="font-medium">Block hash</TableHead>
-                  {/* <TableHead className="font-medium">fee</TableHead> */}
+                  <TableHead className="font-medium">Sender Address</TableHead>
+                  <TableHead className="font-medium">
+                    Receiver Address
+                  </TableHead>
+                  <TableHead className="font-medium">Amount</TableHead>
                   <TableHead className="font-medium">Gas fee</TableHead>
-                  {/* <TableHead className="font-medium">Index</TableHead> */}
                   <TableHead className="font-medium">Status</TableHead>
                   <TableHead className="font-medium">Nonce</TableHead>
                   <TableHead className="font-medium">Time</TableHead>
@@ -68,17 +70,21 @@ export default function Transactions() {
                         {transaction.transaction.transaction_id}{" "}
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-sm max-w-[150px] ">
-                      <div className="truncate">{transaction.hash}</div>
+                    <TableCell>
+                      {transaction.transaction.sender_address}
                     </TableCell>
-                    {/* <TableCell>{transaction.fee}</TableCell> */}
+                    <TableCell>
+                      {transaction.transaction.receiver_address}
+                    </TableCell>
+                    <TableCell>{transaction.transaction.amount}</TableCell>
                     <TableCell>{transaction.transaction.gas_fee}</TableCell>
-                    {/* <TableCell>{transaction.index}</TableCell> */}
                     <TableCell>
                       <TransactionStatus status={transaction.status} />
                     </TableCell>
                     <TableCell>{transaction.nonce}</TableCell>
-                    <TableCell>{formatTimestamp(transaction.timestamp)}</TableCell>
+                    <TableCell>
+                      {formatTimestamp(transaction.timestamp)}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -103,17 +109,21 @@ export default function Transactions() {
                 </div>
                 <div className="grid grid-cols-2 gap-4 max-w-[360px]">
                   <div>
-                    <p className="text-sm text-gray-500">Block Hash</p>
-                    <p className="font-mono text-sm truncate">{transaction.hash}</p>
+                    <p className="text-sm text-gray-500">Sender Address</p>
+                    <p className="font-mono text-sm">
+                      {transaction.transaction.sender_address}
+                    </p>
                   </div>
-                  {/* <div> */}
-                  {/* <p className="text-sm text-gray-500">Index</p> */}
-                  {/* <p className="text-sm">{transaction.index}</p> */}
-                  {/* </div> */}
-                  {/* <div> */}
-                  {/* <p className="text-sm text-gray-500">Fee</p> */}
-                  {/* <p className="text-sm">{transaction.fee}</p> */}
-                  {/* </div> */}
+                  <div>
+                    <p className="text-sm text-gray-500">Receiver Address</p>
+                    <p className="font-mono text-sm">
+                      {transaction.transaction.receiver_address}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Amount</p>
+                    <p className="text-sm">{transaction.transaction.amount}</p>
+                  </div>
                   <div>
                     <p className="text-sm text-gray-500">Gas Fee</p>
                     <p className="text-sm">{transaction.transaction.gas_fee}</p>
@@ -124,7 +134,9 @@ export default function Transactions() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Time</p>
-                    <p className="text-sm">{formatTimestamp(transaction.timestamp)}</p>
+                    <p className="text-sm">
+                      {formatTimestamp(transaction.timestamp)}
+                    </p>
                   </div>
                 </div>
               </div>
