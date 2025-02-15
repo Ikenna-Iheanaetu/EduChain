@@ -89,6 +89,7 @@ export default function FindTutors() {
             {displayedCourses?.map((course, index) => (
               <ServiceCard
                 key={index}
+                courseId={course.courseid}
                 variant={getVariantForCourse(course.color)}
                 title={course.course_name}
                 author={course.tutor_name}
