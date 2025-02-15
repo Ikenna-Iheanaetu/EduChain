@@ -12,62 +12,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-const transactions = [
-  {
-    id: "hjjhvhjvjvjhvhghg",
-    blockHash: "00c88bhbubjb",
-    fee: "VC 0.8",
-    gasFee: "VC 0.8",
-    index: "4",
-    status: "pending" as const,
-    nonce: "99999",
-    time: "12-09-2024 :30",
-  },
-  {
-    id: "hjjhvhjvjvjhvhghg",
-    blockHash: "00c88bhbubjb",
-    fee: "VC 0.8",
-    gasFee: "VC 0.8",
-    index: "4",
-    status: "pending" as const,
-    nonce: "99999",
-    time: "12-09-2024 :30",
-  },
-  {
-    id: "hjjhvhjvjvjhvhghg",
-    blockHash: "00c88bhbubjb",
-    fee: "VC 0.8",
-    gasFee: "VC 0.8",
-    index: "4",
-    status: "Completed" as const,
-    nonce: "99999",
-    time: "12-09-2024 :30",
-  },
-  {
-    id: "hjjhvhjvjvjhvhghg",
-    blockHash: "00c88bhbubjb",
-    fee: "VC 0.8",
-    gasFee: "VC 0.8",
-    index: "4",
-    status: "Completed" as const,
-    nonce: "99999",
-    time: "12-09-2024 :30",
-  },
-  {
-    id: "hjjhvhjvjvjhvhghg",
-    blockHash: "00c88bhbubjb",
-    fee: "VC 0.8",
-    gasFee: "VC 0.8",
-    index: "4",
-    status: "Completed" as const,
-    nonce: "99999",
-    time: "12-09-2024 :30",
-  },
-];
+import { useGetTransactions } from "@/hooks/transactions";
+import { format } from "date-fns"
 
 export default function Transactions() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { data: transactions } = useGetTransactions();
+  console.log(transactions);
+
+  const formatTimestamp = (timestamp: number) => {
+    const date = new Date(timestamp * 1000); // Convert from seconds to milliseconds
+    return format(date, "PPpp"); // Example format: "Jan 1, 2025 at 10:30 AM"
+  };
 
   return (
     <DashboardLayout>
@@ -95,31 +51,34 @@ export default function Transactions() {
                 <TableRow className="bg-gray-50 hover:bg-gray-50">
                   <TableHead className="font-medium">Transaction ID</TableHead>
                   <TableHead className="font-medium">block hash</TableHead>
-                  <TableHead className="font-medium">fee</TableHead>
+                  {/* <TableHead className="font-medium">fee</TableHead> */}
                   <TableHead className="font-medium">gas fee</TableHead>
-                  <TableHead className="font-medium">Index</TableHead>
+                  {/* <TableHead className="font-medium">Index</TableHead> */}
                   <TableHead className="font-medium">Status</TableHead>
                   <TableHead className="font-medium">nonce</TableHead>
                   <TableHead className="font-medium">time</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((transaction, index) => (
+                {(transactions || []).map((transaction, index) => (
                   <TableRow key={index} className="hover:bg-gray-50">
-                    <TableCell className="font-mono text-sm">
-                      {transaction.id}
+                    <TableCell className="font-mono text-sm max-w-[150px]">
+                      <div className="truncate">
+                        {" "}
+                        {transaction.transaction.transaction_id}{" "}
+                      </div>
                     </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {transaction.blockHash}
+                    <TableCell className="font-mono text-sm max-w-[150px] ">
+                      <div className="truncate">{transaction.hash}</div>
                     </TableCell>
-                    <TableCell>{transaction.fee}</TableCell>
-                    <TableCell>{transaction.gasFee}</TableCell>
-                    <TableCell>{transaction.index}</TableCell>
+                    {/* <TableCell>{transaction.fee}</TableCell> */}
+                    <TableCell>{transaction.transaction.gas_fee}</TableCell>
+                    {/* <TableCell>{transaction.index}</TableCell> */}
                     <TableCell>
                       <TransactionStatus status={transaction.status} />
                     </TableCell>
                     <TableCell>{transaction.nonce}</TableCell>
-                    <TableCell>{transaction.time}</TableCell>
+                    <TableCell>{formatTimestamp(transaction.timestamp)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -128,7 +87,7 @@ export default function Transactions() {
 
           {/* Mobile Card View */}
           <div className="space-y-4 md:hidden">
-            {transactions.map((transaction, index) => (
+            {(transactions || []).map((transaction, index) => (
               <div
                 key={index}
                 className="rounded-lg border border-gray-200 p-4 space-y-4"
@@ -136,26 +95,28 @@ export default function Transactions() {
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
                     <p className="text-sm text-gray-500">Transaction ID</p>
-                    <p className="font-mono text-sm">{transaction.id}</p>
+                    <p className="font-mono text-sm">
+                      {transaction.transaction.transaction_id}
+                    </p>
                   </div>
                   <TransactionStatus status={transaction.status} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 max-w-[360px]">
                   <div>
                     <p className="text-sm text-gray-500">Block Hash</p>
-                    <p className="font-mono text-sm">{transaction.blockHash}</p>
+                    <p className="font-mono text-sm truncate">{transaction.hash}</p>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Index</p>
-                    <p className="text-sm">{transaction.index}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Fee</p>
-                    <p className="text-sm">{transaction.fee}</p>
-                  </div>
+                  {/* <div> */}
+                  {/* <p className="text-sm text-gray-500">Index</p> */}
+                  {/* <p className="text-sm">{transaction.index}</p> */}
+                  {/* </div> */}
+                  {/* <div> */}
+                  {/* <p className="text-sm text-gray-500">Fee</p> */}
+                  {/* <p className="text-sm">{transaction.fee}</p> */}
+                  {/* </div> */}
                   <div>
                     <p className="text-sm text-gray-500">Gas Fee</p>
-                    <p className="text-sm">{transaction.gasFee}</p>
+                    <p className="text-sm">{transaction.transaction.gas_fee}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Nonce</p>
@@ -163,7 +124,7 @@ export default function Transactions() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Time</p>
-                    <p className="text-sm">{transaction.time}</p>
+                    <p className="text-sm">{formatTimestamp(transaction.timestamp)}</p>
                   </div>
                 </div>
               </div>
