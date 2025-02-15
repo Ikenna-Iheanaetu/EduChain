@@ -22,7 +22,7 @@ export default function Recover() {
       </AuthLayout>
     )
   }
-  // In a real app, this would come from your wallet generation service
+  
   const recoveryPhrase = phraseData.split(" ");
 
   return (

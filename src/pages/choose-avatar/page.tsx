@@ -52,7 +52,7 @@ export default function ChooseAvatar() {
               onClick={() => setSelectedAvatar(index)}
             >
               <img
-                src={avatar || "/placeholder.svg"}
+                src={avatar }
                 alt={`Avatar option ${index + 1}`}
                 className="object-cover"
               />

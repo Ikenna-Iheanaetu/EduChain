@@ -47,6 +47,7 @@ export default function DashboardHeader({
         break;
     }
   };
+  
   return (
     <div className="flex items-center justify-between border-b bg-white p-4">
       <div className="lg:hidden">
