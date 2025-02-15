@@ -18,7 +18,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLogin } from "@/hooks/auth";
 
 export default function SignIn() {
-  const [isPending, startTransition] = useTransition();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, startTransition] = useTransition();
   const navigate = useNavigate();
   const login = useLogin();
 
