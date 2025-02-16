@@ -1,11 +1,14 @@
-import { useState } from "react"
-import { Search, Menu, Send } from "lucide-react"
+"use client"
+
+import { useState, useRef, useEffect } from "react"
+import { Search, Menu, Send, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import DashboardLayout from "@/pages/dashboard/dashboard-layout";
 import Sidebar from "@/components/sidebar";
+import { cn } from "@/lib/utils"
 
 interface Message {
   id: string
@@ -78,10 +81,21 @@ const messages: Message[] = [
   // Add more messages...
 ]
 
-export default function MessagesPage() {
+export default function Messages() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [messageInput, setMessageInput] = useState("")
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
+
+  const handleBack = () => {
+    setSelectedConversation(null)
+  }
+
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+    }
+  }, [])
 
   return (
     <DashboardLayout>
@@ -94,9 +108,14 @@ export default function MessagesPage() {
         </SheetContent>
       </Sheet>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden bg-white">
         {/* Message List */}
-        <div className="w-full md:w-80 border-r flex flex-col bg-white">
+        <div
+          className={cn(
+            "w-full md:w-80 border-r flex flex-col bg-white transition-transform duration-300 md:translate-x-0",
+            selectedConversation ? "-translate-x-full md:translate-x-0" : "translate-x-0",
+          )}
+        >
           <div className="p-4 border-b">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsSidebarOpen(true)}>
@@ -135,11 +154,19 @@ export default function MessagesPage() {
         </div>
 
         {/* Chat View */}
-        <div className="hidden md:flex flex-1 flex-col bg-white">
+        <div
+          className={cn(
+            "absolute inset-0 md:relative md:flex flex-1 flex-col bg-white transition-transform duration-300 md:translate-x-0",
+            selectedConversation ? "translate-x-0" : "translate-x-full md:translate-x-0",
+          )}
+        >
           {selectedConversation ? (
-            <>
+            <div className="flex flex-col h-full">
               <div className="p-4 border-b">
                 <div className="flex items-center gap-3">
+                  <Button variant="ghost" size="icon" className="md:hidden mr-1" onClick={handleBack}>
+                    <ArrowLeft className="h-6 w-6" />
+                  </Button>
                   <img
                     src={selectedConversation.avatar || "/placeholder.svg"}
                     alt=""
@@ -148,7 +175,7 @@ export default function MessagesPage() {
                   <span className="font-medium">{selectedConversation.name}</span>
                 </div>
               </div>
-              <ScrollArea className="flex-1 p-4">
+              <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
                 <div className="space-y-4">
                   {messages.map((message) => (
                     <div
@@ -172,7 +199,7 @@ export default function MessagesPage() {
                   ))}
                 </div>
               </ScrollArea>
-              <div className="p-4 border-t">
+              <div className="p-4 border-t mt-auto">
                 <div className="flex items-center gap-2">
                   <Input
                     placeholder="Type a message..."
@@ -185,9 +212,9 @@ export default function MessagesPage() {
                   </Button>
                 </div>
               </div>
-            </>
+            </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-500">
+            <div className="hidden md:flex flex-1 items-center justify-center text-gray-500">
               Select a conversation to start messaging
             </div>
           )}

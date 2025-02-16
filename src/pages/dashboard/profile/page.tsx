@@ -25,6 +25,7 @@ import Sixth from "@/assets/avatars/sixth.jpeg";
 import { cn } from "@/lib/utils";
 import { useProfile, useUpdateProfile } from "@/hooks/profile";
 import { toast } from "sonner";
+import { pickAnImage } from "@/lib/pick-image";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -52,31 +53,6 @@ export default function Profile() {
       lastName: profile?.lastname,
     },
   });
-
-  const pickAnImage = (imageNumber: number) => {
-    switch (imageNumber) {
-      case 1:
-        return First;
-
-      case 2:
-        return Second;
-
-      case 3:
-        return Third;
-
-      case 4:
-        return Fourth;
-
-      case 5:
-        return Fifth;
-
-      case 6:
-        return Sixth;
-
-      default:
-        break;
-    }
-  };
 
   interface UpdateCheckType {
     firstname: string | undefined;
