@@ -118,7 +118,7 @@ export default function MyRequests() {
                   <TableHead className="font-medium">Price</TableHead>
                   <TableHead className="font-medium">Date & Time</TableHead>
                   <TableHead className="font-medium">Status</TableHead>
-                  <TableHead className="font-medium">Actions</TableHead>
+                  <TableHead className="font-medium" colSpan={2}>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

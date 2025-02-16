@@ -5,7 +5,6 @@ import DashboardLayout from "@/pages/dashboard/dashboard-layout";
 import Sidebar from "@/components/sidebar";
 import ServiceCard from "@/pages/dashboard/service-card";
 import StatusBadge from "@/components/status-badge";
-import ActionButtons from "@/components/action-buttons";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
   Table,
@@ -135,9 +134,6 @@ export default function MyOffers() {
                       <TableHead className="font-medium">Price</TableHead>
                       <TableHead className="font-medium">Date & Time</TableHead>
                       <TableHead className="font-medium">Status</TableHead>
-                      <TableHead className="font-medium" colSpan={2}>
-                        Actions
-                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -155,9 +151,6 @@ export default function MyOffers() {
                         <TableCell>{request.dateTime}</TableCell>
                         <TableCell>
                           <StatusBadge status={request.status} />
-                        </TableCell>
-                        <TableCell>
-                          <ActionButtons status={request.status} />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -192,9 +185,6 @@ export default function MyOffers() {
                         <p className="text-gray-500">Date & Time</p>
                         <p className="font-medium">{request.dateTime}</p>
                       </div>
-                    </div>
-                    <div className="pt-2">
-                      <ActionButtons status={request.status} />
                     </div>
                   </div>
                 ))}
