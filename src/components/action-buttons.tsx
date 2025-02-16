@@ -7,18 +7,15 @@ interface ActionButtonsProps {
   onComplete?: () => void;
   onAcceptIsPendingCheck: boolean;
   onRejectIsPendingCheck: boolean;
-  onCompleteIsPendingCheck: boolean;
+  onCompleteIsPendingCheck?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function ActionButtons({
   status,
-  onComplete,
   onAccept,
   onReject,
   onAcceptIsPendingCheck,
   onRejectIsPendingCheck,
-  onCompleteIsPendingCheck,
 }: ActionButtonsProps) {
   if (status === "pending") {
     return (
@@ -43,18 +40,18 @@ export default function ActionButtons({
     );
   }
 
-  if (status === "accepted") {
-    return (
-      <Button
-        disabled={onCompleteIsPendingCheck}
-        onClick={onComplete}
-        size="sm"
-        className="bg-[#0095FF] hover:bg-blue-600 text-white h-7 px-4"
-      >
-        {onCompleteIsPendingCheck ? "Completing..." : "Complete"}
-      </Button>
-    );
-  }
+  // if (status === "accepted") {
+  //   return (
+  //     <Button
+  //       disabled={onCompleteIsPendingCheck}
+  //       onClick={onComplete}
+  //       size="sm"
+  //       className="bg-[#0095FF] hover:bg-blue-600 text-white h-7 px-4"
+  //     >
+  //       {onCompleteIsPendingCheck ? "Completing..." : "Complete"}
+  //     </Button>
+  //   );
+  // }
 
   if (status === "completed") {
     return (

@@ -13,14 +13,67 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DashboardHeader from "../dashboard-header";
-import { useGetMyOffers } from "@/hooks/my-offers";
+import {
+  useAcceptOffers,
+  useGetMyOffers,
+  useRejectOffers,
+} from "@/hooks/my-offers";
 import { format } from "date-fns";
+import ActionButtons from "@/components/action-buttons";
+import { useDeleteCourse } from "@/hooks/course";
 
 export default function MyOffers() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<number | null>(null);
+  const [loadingStates, setLoadingStates] = useState<{
+    [key: string]: {
+      accepting: boolean;
+      rejecting: boolean;
+    };
+  }>({});
+  const deleteCourse = useDeleteCourse();
+  const acceptOffer = useAcceptOffers();
+  const rejectOffer = useRejectOffers();
 
   const { data: myOffers } = useGetMyOffers();
+
+  const updateLoadingState = (
+    requestId: string,
+    key: "rejecting" | "accepting",
+    value: boolean
+  ) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [requestId]: {
+        ...prev[requestId],
+        [key]: value,
+      },
+    }));
+  };
+
+  const handleAcceptOffer = (requestId: string) => {
+    updateLoadingState(requestId, "accepting", true);
+
+    try {
+      acceptOffer.mutateAsync(requestId);
+    } finally {
+      updateLoadingState(requestId, "accepting", false);
+    }
+  };
+
+  const handleRejectOffer = (requestId: string) => {
+    updateLoadingState(requestId, "rejecting", true);
+
+    try {
+      rejectOffer.mutateAsync(requestId);
+    } finally {
+      updateLoadingState(requestId, "rejecting", false);
+    }
+  };
+
+  const handleDeleteCourse = (courseId: string) => {
+    deleteCourse.mutateAsync(courseId);
+  };
 
   const offers = myOffers || [];
 
@@ -59,6 +112,8 @@ export default function MyOffers() {
                   index % 3 === 0 ? "blue" : index % 3 === 1 ? "mint" : "blue"
                 }
                 onAction={() => setSelectedOffer(index)}
+                onDelete={() => handleDeleteCourse(offer.courseid)}
+                isDeletingCheck={deleteCourse.status === "pending"}
               />
             ))}
           </div>
@@ -81,6 +136,9 @@ export default function MyOffers() {
                       <TableHead className="font-medium">Price</TableHead>
                       <TableHead className="font-medium">Date & Time</TableHead>
                       <TableHead className="font-medium">Status</TableHead>
+                      <TableHead className="font-medium" colSpan={2}>
+                        Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -109,6 +167,25 @@ export default function MyOffers() {
                             </TableCell>
                             <TableCell>
                               <StatusBadge status={request.status} />
+                            </TableCell>
+                            <TableCell>
+                              <ActionButtons
+                                status={request.status}
+                                onAcceptIsPendingCheck={
+                                  loadingStates[request.requestid]?.accepting ||
+                                  false
+                                }
+                                onRejectIsPendingCheck={
+                                  loadingStates[request.requestid]?.rejecting ||
+                                  false
+                                }
+                                onAccept={() =>
+                                  handleAcceptOffer(request.requestid)
+                                }
+                                onReject={() =>
+                                  handleRejectOffer(request.requestid)
+                                }
+                              />
                             </TableCell>
                           </TableRow>
                         ))
@@ -156,6 +233,25 @@ export default function MyOffers() {
                           <p className="font-medium">
                             {format(new Date(request.created_at), "PPpp")}
                           </p>
+                        </div>
+                        <div className="pt-2">
+                          <ActionButtons
+                            status={request.status}
+                            onAcceptIsPendingCheck={
+                              loadingStates[request.requestid]?.accepting ||
+                              false
+                            }
+                            onRejectIsPendingCheck={
+                              loadingStates[request.requestid]?.rejecting ||
+                              false
+                            }
+                            onAccept={() =>
+                              handleAcceptOffer(request.requestid)
+                            }
+                            onReject={() =>
+                              handleRejectOffer(request.requestid)
+                            }
+                          />
                         </div>
                       </div>
                     </div>

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Trash2 } from "lucide-react";
 
 interface ServiceCardProps {
   courseId: string;
@@ -11,9 +12,11 @@ interface ServiceCardProps {
   price?: string;
   duration?: string;
   mode?: "request" | "offer";
+  onDelete?: () => void;
   onAction?: (mode: "request" | "offer", courseId?: string) => void;
   isLoading?: boolean;
   loadingCourseId?: string | null;
+  isDeletingCheck?: boolean;
 }
 
 export default function ServiceCard({
@@ -26,7 +29,9 @@ export default function ServiceCard({
   duration = "1 hour",
   mode = "request",
   onAction,
+  onDelete,
   loadingCourseId = null,
+  isDeletingCheck,
 }: ServiceCardProps) {
   const bgColors = {
     blue: "bg-[#F0F7FF]",
@@ -78,6 +83,20 @@ export default function ServiceCard({
                 ? "Requesting Service..."
                 : "Request Service"}
             </Button>
+            {mode === "offer" && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 text-gray-500 hover:text-gray-700"
+                onClick={onDelete}
+              >
+                {isDeletingCheck ? (
+                  "Deleing..."
+                ) : (
+                  <Trash2 className="h-5 w-5" />
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>

@@ -28,6 +28,30 @@ export const useCreateCourse = () => {
     },
   });
 };
+export const useDeleteCourse = () => {
+  const queryClient = new QueryClient();
+
+  return useMutation({
+    mutationFn: courseApi.deleteCourse,
+
+    onSuccess: (data) => {
+      console.log(data);
+      //* Invalidate and refetch the profile data
+      queryClient.invalidateQueries({ queryKey: ["latestCourses"] });
+      queryClient.invalidateQueries({ queryKey: ["popularCourses"] });
+      toast.success("Course deleted successfully");
+    },
+    onError: (error: AxiosError<{ error?: string }>) => {
+      console.log(error);
+      const errorMessage =
+        error.response?.data?.error ||
+        "Failed to delete account. Please try again.";
+
+      console.log(errorMessage);
+      toast.error(errorMessage || "Failed to delete account");
+    },
+  });
+};
 
 export const useGetLatestCourses = () => {
   return useQuery<{ courses: CoursesProps[] }, AxiosError>({

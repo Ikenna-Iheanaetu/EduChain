@@ -18,12 +18,10 @@ import { useCompleteOffers, useRejectOffers } from "@/hooks/my-offers";
 import { useGetMyRequests } from "@/hooks/my-requests";
 
 export default function MyRequests() {
-  const rejectRequest = useRejectOffers();
-  const completeRequest = useCompleteOffers();
+  const rejectOffer = useRejectOffers();
+  const completeOffer = useCompleteOffers();
   const { data: requests } = useGetMyRequests();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  console.table(requests);
 
   const [loadingStates, setLoadingStates] = useState<{
     [key: string]: {
@@ -44,12 +42,13 @@ export default function MyRequests() {
       "pending" | "accepted",
       (id: string) => Promise<void>
     > = {
-      pending: handleCancelRequest,
-      accepted: handleCompleteRequest,
+      pending: handleCancelOffer,
+      accepted: handleCompleteOffer,
     };
 
     await actionMap[actionType](requestId);
   };
+
   const updateLoadingState = (
     requestId: string,
     key: "rejecting" | "completing",
@@ -63,6 +62,7 @@ export default function MyRequests() {
       },
     }));
   };
+
   const handleRequestAction = async (
     requestId: string,
     key: "rejecting" | "completing",
@@ -77,11 +77,12 @@ export default function MyRequests() {
     }
   };
 
-  const handleCancelRequest = (requestId: string) =>
-    handleRequestAction(requestId, "rejecting", rejectRequest.mutateAsync);
-
-  const handleCompleteRequest = (requestId: string) =>
-    handleRequestAction(requestId, "completing", completeRequest.mutateAsync);
+  const handleCancelOffer = (requestId: string) =>
+    handleRequestAction(requestId, "rejecting", () => rejectOffer.mutateAsync(requestId));
+  
+  const handleCompleteOffer = (requestId: string) =>
+    handleRequestAction(requestId, "completing", () => completeOffer.mutateAsync(requestId));
+  
 
   return (
     <DashboardLayout>

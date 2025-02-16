@@ -21,4 +21,8 @@ export const courseApi = {
     const { data } = await api.get("/course/latest");
     return data;
   },
+  deleteCourse: async (courseId: string) => {
+    const { data } = await api.delete(`/course/${courseId}`)
+    return data
+  }
 };

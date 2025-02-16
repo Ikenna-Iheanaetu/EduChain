@@ -19,7 +19,7 @@ export const useAcceptOffers = () => {
   const mineMutation = useMine();
 
   return useMutation({
-    mutationFn: myOffersApi.acceptRequest,
+    mutationFn: myOffersApi.acceptOffer,
 
     onSuccess: async (data) => {
       console.log(data);
@@ -49,7 +49,7 @@ export const useRejectOffers = () => {
   const mineMutation = useMine();
 
   return useMutation({
-    mutationFn: myOffersApi.rejectRequest,
+    mutationFn: myOffersApi.rejectOffer,
 
     onSuccess: async (data) => {
       console.log(data);
@@ -79,7 +79,7 @@ export const useCompleteOffers = () => {
   const mineMutation = useMine();
 
   return useMutation({
-    mutationFn: myOffersApi.completeRequest,
+    mutationFn: myOffersApi.completeOffer,
 
     onSuccess: async (data) => {
       console.log(data);
