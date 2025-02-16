@@ -12,25 +12,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DashboardHeader from "../dashboard-header";
-import {
-  useAcceptRequest,
-  useCompleteRequest,
-  useGetMyRequests,
-  useRejectRequest,
-} from "@/hooks/my-requests";
-import ActionButtons from "@/components/action-buttons";
 import { format } from "date-fns";
+import ActionButton from "@/components/action-button";
+import { useCompleteOffers, useRejectOffers } from "@/hooks/my-offers";
+import { useGetMyRequests } from "@/hooks/my-requests";
 
 export default function MyRequests() {
-  const acceptRequest = useAcceptRequest();
-  const rejectRequest = useRejectRequest();
-  const completeRequest = useCompleteRequest();
+  const rejectRequest = useRejectOffers();
+  const completeRequest = useCompleteOffers();
   const { data: requests } = useGetMyRequests();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  console.table(requests);
+
   const [loadingStates, setLoadingStates] = useState<{
     [key: string]: {
-      accepting: boolean;
       rejecting: boolean;
       completing: boolean;
     };
@@ -40,53 +36,52 @@ export default function MyRequests() {
     return format(timestamp, "PPpp");
   };
 
-  const handleAcceptRequest = async (requestId: string) => {
+  const onClick = async (
+    actionType: "pending" | "accepted",
+    requestId: string
+  ) => {
+    const actionMap: Record<
+      "pending" | "accepted",
+      (id: string) => Promise<void>
+    > = {
+      pending: handleCancelRequest,
+      accepted: handleCompleteRequest,
+    };
+
+    await actionMap[actionType](requestId);
+  };
+  const updateLoadingState = (
+    requestId: string,
+    key: "rejecting" | "completing",
+    value: boolean
+  ) => {
     setLoadingStates((prev) => ({
       ...prev,
-      [requestId]: { ...(prev[requestId] || {}), accepting: true },
+      [requestId]: {
+        ...prev[requestId],
+        [key]: value,
+      },
     }));
+  };
+  const handleRequestAction = async (
+    requestId: string,
+    key: "rejecting" | "completing",
+    action: (id: string) => Promise<void>
+  ) => {
+    updateLoadingState(requestId, key, true);
 
     try {
-      await acceptRequest.mutateAsync(requestId);
+      await action(requestId);
     } finally {
-      setLoadingStates((prev) => ({
-        ...prev,
-        [requestId]: { ...(prev[requestId] || {}), accepting: false },
-      }));
+      updateLoadingState(requestId, key, false);
     }
   };
 
-  const handleRejectRequest = async (requestId: string) => {
-    setLoadingStates((prev) => ({
-      ...prev,
-      [requestId]: { ...(prev[requestId] || {}), rejecting: true },
-    }));
+  const handleCancelRequest = (requestId: string) =>
+    handleRequestAction(requestId, "rejecting", rejectRequest.mutateAsync);
 
-    try {
-      await rejectRequest.mutateAsync(requestId);
-    } finally {
-      setLoadingStates((prev) => ({
-        ...prev,
-        [requestId]: { ...(prev[requestId] || {}), rejecting: false },
-      }));
-    }
-  };
-
-  const handleCompleteRequest = async (requestId: string) => {
-    setLoadingStates((prev) => ({
-      ...prev,
-      [requestId]: { ...(prev[requestId] || {}), completing: true },
-    }));
-
-    try {
-      await completeRequest.mutateAsync(requestId);
-    } finally {
-      setLoadingStates((prev) => ({
-        ...prev,
-        [requestId]: { ...(prev[requestId] || {}), completing: false },
-      }));
-    }
-  };
+  const handleCompleteRequest = (requestId: string) =>
+    handleRequestAction(requestId, "completing", completeRequest.mutateAsync);
 
   return (
     <DashboardLayout>
@@ -117,9 +112,7 @@ export default function MyRequests() {
                   <TableHead className="font-medium">Price</TableHead>
                   <TableHead className="font-medium">Date & Time</TableHead>
                   <TableHead className="font-medium">Status</TableHead>
-                  <TableHead className="font-medium" colSpan={2}>
-                    Actions
-                  </TableHead>
+                  <TableHead className="font-medium">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -142,22 +135,22 @@ export default function MyRequests() {
                       <StatusBadge status={request.status} />
                     </TableCell>
                     <TableCell>
-                      <ActionButtons
-                        onAccept={() => handleAcceptRequest(request.requestid)}
-                        onReject={() => handleRejectRequest(request.requestid)}
-                        onComplete={() =>
-                          handleCompleteRequest(request.requestid)
-                        }
-                        onAcceptIsPendingCheck={
-                          loadingStates[request.requestid]?.accepting || false
-                        }
-                        onRejectIsPendingCheck={
-                          loadingStates[request.requestid]?.rejecting || false
-                        }
+                      <ActionButton
+                        action={request.status}
                         onCompleteIsPendingCheck={
                           loadingStates[request.requestid]?.completing || false
                         }
-                        status={request.status}
+                        onCancelIsPendingCheck={
+                          loadingStates[request.requestid]?.rejecting || false
+                        }
+                        onClick={() => {
+                          if (
+                            request.status === "pending" ||
+                            request.status === "accepted"
+                          ) {
+                            onClick(request.status, request.requestid);
+                          }
+                        }}
                       />
                     </TableCell>
                   </TableRow>
@@ -198,20 +191,22 @@ export default function MyRequests() {
                   </div>
                 </div>
                 <div className="pt-2">
-                  <ActionButtons
-                    onAccept={() => handleAcceptRequest(request.requestid)}
-                    onReject={() => handleRejectRequest(request.requestid)}
-                    onComplete={() => handleCompleteRequest(request.requestid)}
-                    onAcceptIsPendingCheck={
-                      loadingStates[request.requestid]?.accepting || false
-                    }
-                    onRejectIsPendingCheck={
-                      loadingStates[request.requestid]?.rejecting || false
-                    }
+                  <ActionButton
+                    action={request.status}
                     onCompleteIsPendingCheck={
                       loadingStates[request.requestid]?.completing || false
                     }
-                    status={request.status}
+                    onCancelIsPendingCheck={
+                      loadingStates[request.requestid]?.rejecting || false
+                    }
+                    onClick={() => {
+                      if (
+                        request.status === "pending" ||
+                        request.status === "accepted"
+                      ) {
+                        onClick(request.status, request.requestid);
+                      }
+                    }}
                   />
                 </div>
               </div>

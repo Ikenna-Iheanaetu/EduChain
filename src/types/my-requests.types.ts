@@ -3,7 +3,7 @@ interface MyRequests {
     created_at: Date
     price: number
     requestid: string
-    status: "pending" | "accepted" | "completed"
+    status: "pending" | "rejected" | "completed" | "accepted"
     tutor_name: string
 }
 

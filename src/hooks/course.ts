@@ -1,15 +1,20 @@
 import { courseApi } from "@/api/course";
 import { CoursesProps } from "@/types/course.types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 
 export const useCreateCourse = () => {
+  const queryClient = new QueryClient();
+
   return useMutation({
     mutationFn: courseApi.createCourse,
 
     onSuccess: (data) => {
       console.log(data);
+      //* Invalidate and refetch the profile data
+      queryClient.invalidateQueries({ queryKey: ["latestCourses"] });
+      queryClient.invalidateQueries({ queryKey: ["popularCourses"] });
       toast.success("Course created successfully");
     },
     onError: (error: AxiosError<{ error?: string }>) => {
@@ -35,7 +40,7 @@ export const useGetLatestCourses = () => {
 
 export const useGetPoplarCourses = () => {
   return useQuery<{ courses: CoursesProps[] }, AxiosError>({
-    queryKey: ["popluarCourses"],
+    queryKey: ["popularCourses"],
     queryFn: courseApi.getPopularCourses,
     staleTime: 1000 * 60 * 5,
     retry: 2,
