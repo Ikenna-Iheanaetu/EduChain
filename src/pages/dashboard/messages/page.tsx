@@ -1,30 +1,31 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { Search, Menu, Send, ArrowLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { useState, useRef, useEffect } from "react";
+import { Search, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import DashboardLayout from "@/pages/dashboard/dashboard-layout";
 import Sidebar from "@/components/sidebar";
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
+import ChatView from "./chat-view";
+import MessageList from "./message-list";
 
 interface Message {
-  id: string
-  content: string
-  sender: string
-  timestamp: string
-  avatar: string
-  isSender: boolean
+  id: string;
+  content: string;
+  sender: string;
+  timestamp: string;
+  avatar: string;
+  isSender: boolean;
 }
 
 interface Conversation {
-  id: string
-  name: string
-  lastMessage: string
-  avatar: string
-  timestamp: string
+  id: string;
+  name: string;
+  lastMessage: string;
+  avatar: string;
+  timestamp: string;
 }
 
 // Mock data
@@ -51,7 +52,7 @@ const conversations: Conversation[] = [
     timestamp: "1h",
   },
   // Add more conversations...
-]
+];
 
 const messages: Message[] = [
   {
@@ -79,23 +80,24 @@ const messages: Message[] = [
     isSender: false,
   },
   // Add more messages...
-]
+];
 
 export default function Messages() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
-  const [messageInput, setMessageInput] = useState("")
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedConversation, setSelectedConversation] =
+    useState<Conversation | null>(null);
+  const [messageInput, setMessageInput] = useState("");
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const handleBack = () => {
-    setSelectedConversation(null)
-  }
+    setSelectedConversation(null);
+  };
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
-  }, [])
+  }, []);
 
   return (
     <DashboardLayout>
@@ -109,110 +111,57 @@ export default function Messages() {
       </Sheet>
 
       <div className="flex flex-1 overflow-hidden bg-white">
-        {/* Message List */}
         <div
           className={cn(
             "w-full md:w-80 border-r flex flex-col bg-white transition-transform duration-300 md:translate-x-0",
-            selectedConversation ? "-translate-x-full md:translate-x-0" : "translate-x-0",
+            selectedConversation
+              ? "-translate-x-full md:translate-x-0"
+              : "translate-x-0"
           )}
         >
+          {/* Header */}
           <div className="p-4 border-b">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsSidebarOpen(true)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setIsSidebarOpen(true)}
+              >
                 <Menu className="h-6 w-6" />
               </Button>
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input placeholder="Search messages" className="pl-9 h-10 bg-[#F8FAFC]" />
+                <Input
+                  placeholder="Search messages"
+                  className="pl-9 h-10 bg-[#F8FAFC]"
+                />
               </div>
             </div>
           </div>
-          <ScrollArea className="flex-1">
-            {conversations.map((conversation) => (
-              <button
-                key={conversation.id}
-                onClick={() => setSelectedConversation(conversation)}
-                className={`w-full p-4 flex items-start gap-3 hover:bg-gray-50 transition-colors ${
-                  selectedConversation?.id === conversation.id ? "bg-gray-50" : ""
-                }`}
-              >
-                <img
-                  src={conversation.avatar || "/placeholder.svg"}
-                  alt=""
-                  className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-                />
-                <div className="flex-1 min-w-0 text-left">
-                  <div className="flex justify-between items-start">
-                    <span className="font-medium truncate">{conversation.name}</span>
-                    <span className="text-xs text-gray-500 ml-2">{conversation.timestamp}</span>
-                  </div>
-                  <p className="text-sm text-gray-500 truncate">{conversation.lastMessage}</p>
-                </div>
-              </button>
-            ))}
-          </ScrollArea>
+
+          {/* Message List */}
+         <MessageList conversations={conversations} selectedConversation={selectedConversation} setSelectedConversation={setSelectedConversation} />
         </div>
 
         {/* Chat View */}
         <div
           className={cn(
             "absolute inset-0 md:relative md:flex flex-1 flex-col bg-white transition-transform duration-300 md:translate-x-0",
-            selectedConversation ? "translate-x-0" : "translate-x-full md:translate-x-0",
+            selectedConversation
+              ? "translate-x-0"
+              : "translate-x-full md:translate-x-0"
           )}
         >
           {selectedConversation ? (
-            <div className="flex flex-col h-full">
-              <div className="p-4 border-b">
-                <div className="flex items-center gap-3">
-                  <Button variant="ghost" size="icon" className="md:hidden mr-1" onClick={handleBack}>
-                    <ArrowLeft className="h-6 w-6" />
-                  </Button>
-                  <img
-                    src={selectedConversation.avatar || "/placeholder.svg"}
-                    alt=""
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <span className="font-medium">{selectedConversation.name}</span>
-                </div>
-              </div>
-              <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-                <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex items-start gap-3 ${message.isSender ? "flex-row-reverse" : ""}`}
-                    >
-                      <img
-                        src={message.avatar || "/placeholder.svg"}
-                        alt=""
-                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                      />
-                      <div
-                        className={`rounded-lg p-3 max-w-[70%] ${
-                          message.isSender ? "bg-[#6366F1] text-white" : "bg-gray-100"
-                        }`}
-                      >
-                        <p>{message.content}</p>
-                        <span className="text-xs mt-1 block opacity-70">{message.timestamp}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-              <div className="p-4 border-t mt-auto">
-                <div className="flex items-center gap-2">
-                  <Input
-                    placeholder="Type a message..."
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button size="icon" className="bg-[#6366F1] hover:bg-[#4F46E5]">
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <ChatView
+              selectedConversation={selectedConversation}
+              messages={messages}
+              messageInput={messageInput}
+              setMessageInput={setMessageInput}
+              scrollAreaRef={scrollAreaRef}
+              handleBack={() => handleBack()}
+            />
           ) : (
             <div className="hidden md:flex flex-1 items-center justify-center text-gray-500">
               Select a conversation to start messaging
@@ -221,6 +170,5 @@ export default function Messages() {
         </div>
       </div>
     </DashboardLayout>
-  )
+  );
 }
-
