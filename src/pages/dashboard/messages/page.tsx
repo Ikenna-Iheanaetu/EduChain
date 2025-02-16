@@ -10,6 +10,7 @@ import Sidebar from "@/components/sidebar";
 import { cn } from "@/lib/utils";
 import ChatView from "./chat-view";
 import MessageList from "./message-list";
+import { useGetMessageContacts } from "@/hooks/messages";
 
 interface Message {
   id: string;
@@ -88,6 +89,9 @@ export default function Messages() {
     useState<Conversation | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const { data: contacts } = useGetMessageContacts()
+  console.log(contacts)
 
   const handleBack = () => {
     setSelectedConversation(null);
