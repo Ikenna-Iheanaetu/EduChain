@@ -36,11 +36,10 @@ export default function MyRequests() {
     };
   }>({});
 
-  
   const formatTimestamp = (timestamp: Date) => {
     return format(timestamp, "PPpp");
   };
-  
+
   const handleAcceptRequest = async (requestId: string) => {
     setLoadingStates((prev) => ({
       ...prev,
@@ -118,7 +117,9 @@ export default function MyRequests() {
                   <TableHead className="font-medium">Price</TableHead>
                   <TableHead className="font-medium">Date & Time</TableHead>
                   <TableHead className="font-medium">Status</TableHead>
-                  <TableHead className="font-medium" colSpan={2}>Actions</TableHead>
+                  <TableHead className="font-medium" colSpan={2}>
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -201,10 +202,14 @@ export default function MyRequests() {
                     onAccept={() => handleAcceptRequest(request.requestid)}
                     onReject={() => handleRejectRequest(request.requestid)}
                     onComplete={() => handleCompleteRequest(request.requestid)}
-                    onAcceptIsPendingCheck={acceptRequest.status === "pending"}
-                    onRejectIsPendingCheck={rejectRequest.status === "pending"}
+                    onAcceptIsPendingCheck={
+                      loadingStates[request.requestid]?.accepting || false
+                    }
+                    onRejectIsPendingCheck={
+                      loadingStates[request.requestid]?.rejecting || false
+                    }
                     onCompleteIsPendingCheck={
-                      completeRequest.status === "pending"
+                      loadingStates[request.requestid]?.completing || false
                     }
                     status={request.status}
                   />
