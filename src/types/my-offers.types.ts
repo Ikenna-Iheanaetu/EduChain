@@ -16,18 +16,18 @@ interface Student {
   lastname: string;
 }
 
-interface Offers {
+export interface Offers {
   complete_count: number;
   course: Course;
   courseid: string;
   created_at: string;
   requestid: string;
-  status: string;
+  status: "pending" | "accepted" | "completed";
   student: Student;
   studentid: string;
   tutorid: string;
 }
 
 export type MyOffersReturnType = {
-  offers: Offers;
+  offers: Offers[];
 };

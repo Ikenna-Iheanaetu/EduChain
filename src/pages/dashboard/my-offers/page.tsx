@@ -14,73 +14,15 @@ import {
 } from "@/components/ui/table";
 import DashboardHeader from "../dashboard-header";
 import { useGetMyOffers } from "@/hooks/my-offers";
-
-// Add courseId to the offers type
-
-const offers = [
-  {
-    courseId: "course-1", // Added courseId
-    title: "Web Development",
-    author: "Samuel David",
-    authorId: "sjjbjfbjofbehfwbvfbwevbwjbv",
-    price: "0.24 VC",
-    duration: "1 hour",
-  },
-  {
-    courseId: "course-2", // Added courseId
-    title: "Web Development",
-    author: "Samuel David",
-    authorId: "sjjbjfbjofbehfwbvfbwevbwjbv",
-    price: "0.24 VC",
-    duration: "1 hour",
-  },
-  {
-    courseId: "course-3", // Added courseId
-    title: "Web Development",
-    author: "Samuel David",
-    authorId: "sjjbjfbjofbehfwbvfbwevbwjbv",
-    price: "0.24 VC",
-    duration: "1 hour",
-  },
-];
-
-const requests = [
-  {
-    studentName: "samuel collins",
-    studentId: "hhfvhvfvhfb....",
-    price: "0.98 VC",
-    dateTime: "12-09-2025 -5:30pm",
-    status: "pending" as const,
-  },
-  {
-    studentName: "samuel collins",
-    studentId: "hhfvhvfvhfb....",
-    price: "0.98 VC",
-    dateTime: "12-09-2025 -5:30pm",
-    status: "pending" as const,
-  },
-  {
-    studentName: "samuel collins",
-    studentId: "hhfvhvfvhfb....",
-    price: "0.98 VC",
-    dateTime: "12-09-2025 -5:30pm",
-    status: "accepted" as const,
-  },
-  {
-    studentName: "samuel collins",
-    studentId: "hhfvhvfvhfb....",
-    price: "0.98 VC",
-    dateTime: "12-09-2025 -5:30pm",
-    status: "completed" as const,
-  },
-];
+import { format } from "date-fns";
 
 export default function MyOffers() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<number | null>(null);
 
-  const { data: myOffers } = useGetMyOffers()
-  console.log(myOffers)
+  const { data: myOffers } = useGetMyOffers();
+
+  const offers = myOffers || [];
 
   return (
     <DashboardLayout>
@@ -106,7 +48,12 @@ export default function MyOffers() {
             {offers.map((offer, index) => (
               <ServiceCard
                 key={index}
-                {...offer}
+                courseId={offer.courseid}
+                title={offer.course.course_name}
+                author={offer.course.tutor_name}
+                authorId={offer.course.tutor_id}
+                price={`${offer.course.duration} VC`} // Assuming price is based on duration
+                duration={`${offer.course.duration} hours`}
                 mode="offer"
                 variant={
                   index % 3 === 0 ? "blue" : index % 3 === 1 ? "mint" : "blue"
@@ -119,7 +66,9 @@ export default function MyOffers() {
           {/* Selected Offer Requests */}
           {selectedOffer !== null && (
             <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-6">Web Development</h2>
+              <h2 className="text-xl font-semibold mb-6">
+                {offers[selectedOffer].course.course_name}
+              </h2>
 
               {/* Desktop Table View */}
               <div className="hidden md:block rounded-lg border border-gray-200">
@@ -135,57 +84,82 @@ export default function MyOffers() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {requests.map((request, index) => (
-                      <TableRow key={index} className="hover:bg-gray-50">
-                        <TableCell>
-                          <div>
-                            <p>{request.studentName}</p>
-                            <p className="text-gray-500 text-xs">
-                              {request.studentId}
-                            </p>
-                          </div>
-                        </TableCell>
-                        <TableCell>{request.price}</TableCell>
-                        <TableCell>{request.dateTime}</TableCell>
-                        <TableCell>
-                          <StatusBadge status={request.status} />
+                    {offers[selectedOffer].course.total_requests > 0 ? (
+                      offers
+                        .filter(
+                          (offer) =>
+                            offer.courseid === offers[selectedOffer].courseid
+                        )
+                        .map((request, index) => (
+                          <TableRow key={index} className="hover:bg-gray-50">
+                            <TableCell>
+                              <div>
+                                <p>
+                                  {request.student.firstname}{" "}
+                                  {request.student.lastname}
+                                </p>
+                                <p className="text-gray-500 text-xs">
+                                  {request.studentid}
+                                </p>
+                              </div>
+                            </TableCell>
+                            <TableCell>{`${request.course.duration} VC`}</TableCell>
+                            <TableCell>
+                              {format(request.created_at, "PPpp")}
+                            </TableCell>
+                            <TableCell>
+                              <StatusBadge status={request.status} />
+                            </TableCell>
+                          </TableRow>
+                        ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center">
+                          No requests found for this offer.
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
               </div>
 
               {/* Mobile Card View */}
               <div className="space-y-4 md:hidden">
-                {requests.map((request, index) => (
-                  <div
-                    key={index}
-                    className="rounded-lg border border-gray-200 p-4 space-y-3"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {request.studentName}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {request.studentId}
-                        </p>
+                {offers
+                  .filter(
+                    (offer) => offer.courseid === offers[selectedOffer].courseid
+                  ) // Filter requests for the selected course
+                  .map((request, index) => (
+                    <div
+                      key={index}
+                      className="rounded-lg border border-gray-200 p-4 space-y-3"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {request.student.firstname}{" "}
+                            {request.student.lastname}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {request.studentid}
+                          </p>
+                        </div>
+                        <StatusBadge status={request.status} />
                       </div>
-                      <StatusBadge status={request.status} />
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <p className="text-gray-500">Price</p>
+                          <p className="font-medium">{`${request.course.duration} VC`}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Date & Time</p>
+                          <p className="font-medium">
+                            {format(new Date(request.created_at), "PPpp")}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <p className="text-gray-500">Price</p>
-                        <p className="font-medium">{request.price}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500">Date & Time</p>
-                        <p className="font-medium">{request.dateTime}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           )}
