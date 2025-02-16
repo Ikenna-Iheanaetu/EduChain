@@ -2,7 +2,6 @@ import { useState } from "react";
 import DashboardLayout from "@/pages/dashboard/dashboard-layout";
 import Sidebar from "@/components/sidebar";
 import StatusBadge from "@/components/status-badge";
-import ActionButton from "@/components/action-button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
   Table,
@@ -13,70 +12,82 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DashboardHeader from "../dashboard-header";
-import { useGetMyRequests } from "@/hooks/my-requests";
-
-const requests = [
-  {
-    courseName: "Web developmment",
-    tutorName: "samuel collins",
-    tutorId: "hhfvhvfvhfb....",
-    price: "0.98 VC",
-    dateTime: "12-09-2025 -5:30pm",
-    status: "pending" as const,
-    action: "Cancel" as const,
-  },
-  {
-    courseName: "Web developmment",
-    tutorName: "samuel collins",
-    tutorId: "hhfvhvfvhfb....",
-    price: "0.98 VC",
-    dateTime: "12-09-2025 -5:30pm",
-    status: "accepted" as const,
-    action: "Complete" as const,
-  },
-  {
-    courseName: "Web developmment",
-    tutorName: "samuel collins",
-    tutorId: "hhfvhvfvhfb....",
-    price: "0.98 VC",
-    dateTime: "12-09-2025 -5:30pm",
-    status: "completed" as const,
-    action: "Done" as const,
-  },
-  {
-    courseName: "Web developmment",
-    tutorName: "samuel collins",
-    tutorId: "hhfvhvfvhfb....",
-    price: "0.98 VC",
-    dateTime: "12-09-2025 -5:30pm",
-    status: "accepted" as const,
-    action: "Complete" as const,
-  },
-  {
-    courseName: "Web developmment",
-    tutorName: "samuel collins",
-    tutorId: "hhfvhvfvhfb....",
-    price: "0.98 VC",
-    dateTime: "12-09-2025 -5:30pm",
-    status: "accepted" as const,
-    action: "Complete" as const,
-  },
-  {
-    courseName: "Web developmment",
-    tutorName: "samuel collins",
-    tutorId: "hhfvhvfvhfb....",
-    price: "0.98 VC",
-    dateTime: "12-09-2025 -5:30pm",
-    status: "accepted" as const,
-    action: "Complete" as const,
-  },
-];
+import {
+  useAcceptRequest,
+  useCompleteRequest,
+  useGetMyRequests,
+  useRejectRequest,
+} from "@/hooks/my-requests";
+import ActionButtons from "@/components/action-buttons";
+import { format } from "date-fns";
 
 export default function MyRequests() {
+  const acceptRequest = useAcceptRequest();
+  const rejectRequest = useRejectRequest();
+  const completeRequest = useCompleteRequest();
+  const { data: requests } = useGetMyRequests();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { data: mrequests } = useGetMyRequests()
 
-  console.log(mrequests)
+  const [loadingStates, setLoadingStates] = useState<{
+    [key: string]: {
+      accepting: boolean;
+      rejecting: boolean;
+      completing: boolean;
+    };
+  }>({});
+
+  
+  const formatTimestamp = (timestamp: Date) => {
+    return format(timestamp, "PPpp");
+  };
+  
+  const handleAcceptRequest = async (requestId: string) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [requestId]: { ...(prev[requestId] || {}), accepting: true },
+    }));
+
+    try {
+      await acceptRequest.mutateAsync(requestId);
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [requestId]: { ...(prev[requestId] || {}), accepting: false },
+      }));
+    }
+  };
+
+  const handleRejectRequest = async (requestId: string) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [requestId]: { ...(prev[requestId] || {}), rejecting: true },
+    }));
+
+    try {
+      await rejectRequest.mutateAsync(requestId);
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [requestId]: { ...(prev[requestId] || {}), rejecting: false },
+      }));
+    }
+  };
+
+  const handleCompleteRequest = async (requestId: string) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [requestId]: { ...(prev[requestId] || {}), completing: true },
+    }));
+
+    try {
+      await completeRequest.mutateAsync(requestId);
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [requestId]: { ...(prev[requestId] || {}), completing: false },
+      }));
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -111,26 +122,42 @@ export default function MyRequests() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {requests.map((request, index) => (
+                {(requests || []).map((request, index) => (
                   <TableRow key={index} className="hover:bg-gray-50">
                     <TableCell className="font-medium">
-                      {request.courseName}
+                      {request.course_name}
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p>{request.tutorName}</p>
+                        <p>{request.tutor_name}</p>
                         <p className="text-gray-500 text-xs">
-                          {request.tutorId}
+                          {request.requestid}
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>{request.price}</TableCell>
-                    <TableCell>{request.dateTime}</TableCell>
+                    <TableCell>{request.price}VC</TableCell>
+                    <TableCell>{formatTimestamp(request.created_at)}</TableCell>
                     <TableCell>
                       <StatusBadge status={request.status} />
                     </TableCell>
                     <TableCell>
-                      <ActionButton action={request.action} />
+                      <ActionButtons
+                        onAccept={() => handleAcceptRequest(request.requestid)}
+                        onReject={() => handleRejectRequest(request.requestid)}
+                        onComplete={() =>
+                          handleCompleteRequest(request.requestid)
+                        }
+                        onAcceptIsPendingCheck={
+                          loadingStates[request.requestid]?.accepting || false
+                        }
+                        onRejectIsPendingCheck={
+                          loadingStates[request.requestid]?.rejecting || false
+                        }
+                        onCompleteIsPendingCheck={
+                          loadingStates[request.requestid]?.completing || false
+                        }
+                        status={request.status}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -140,7 +167,7 @@ export default function MyRequests() {
 
           {/* Mobile Card View */}
           <div className="space-y-4 md:hidden">
-            {requests.map((request, index) => (
+            {(requests || []).map((request, index) => (
               <div
                 key={index}
                 className="rounded-lg border border-gray-200 p-4 space-y-3"
@@ -148,25 +175,39 @@ export default function MyRequests() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-medium text-gray-900">
-                      {request.courseName}
+                      {request.course_name}
                     </p>
-                    <p className="text-sm text-gray-500">{request.tutorName}</p>
-                    <p className="text-xs text-gray-500">{request.tutorId}</p>
+                    <p className="text-sm text-gray-500">
+                      {request.tutor_name}
+                    </p>
+                    <p className="text-xs text-gray-500">{request.requestid}</p>
                   </div>
                   <StatusBadge status={request.status} />
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <p className="text-gray-500">Price</p>
-                    <p className="font-medium">{request.price}</p>
+                    <p className="font-medium">{request.price}VC</p>
                   </div>
                   <div>
                     <p className="text-gray-500">Date & Time</p>
-                    <p className="font-medium">{request.dateTime}</p>
+                    <p className="font-medium">
+                      {formatTimestamp(request.created_at)}
+                    </p>
                   </div>
                 </div>
                 <div className="pt-2">
-                  <ActionButton action={request.action} className="w-full" />
+                  <ActionButtons
+                    onAccept={() => handleAcceptRequest(request.requestid)}
+                    onReject={() => handleRejectRequest(request.requestid)}
+                    onComplete={() => handleCompleteRequest(request.requestid)}
+                    onAcceptIsPendingCheck={acceptRequest.status === "pending"}
+                    onRejectIsPendingCheck={rejectRequest.status === "pending"}
+                    onCompleteIsPendingCheck={
+                      completeRequest.status === "pending"
+                    }
+                    status={request.status}
+                  />
                 </div>
               </div>
             ))}

@@ -1,12 +1,10 @@
 interface MyRequests {
-    complete_count: number
-    courseid: string
-    created_at: string
+    course_name: string
+    created_at: Date
+    price: number
     requestid: string
-    role: string
-    status: string
-    studentid: string
-    tutorid: string
+    status: "pending" | "accepted" | "completed"
+    tutor_name: string
 }
 
 export type MyRequestsReturnType = {

@@ -13,13 +13,12 @@ export const useCreateCourseRequest = () => {
 
     onSuccess: async (data) => {
       console.log(data);
-      toast.success("Request was made successfully");
-
-      //* Invalidate and refetch the profile data
-      queryClient.invalidateQueries({ queryKey: ["my-requests"] });
 
       try {
         await mineMutation.mutateAsync();
+        //* Invalidate and refetch the profile data
+        queryClient.invalidateQueries({ queryKey: ["my-requests"] });
+        toast.success("Request was made successfully");
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Mining operation failed");
@@ -30,7 +29,96 @@ export const useCreateCourseRequest = () => {
       const errorMessage =
         error.response?.data?.error || "Failed to make request.";
 
-      console.log(errorMessage);
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useAcceptRequest = () => {
+  const queryClient = useQueryClient();
+  const mineMutation = useMine();
+
+  return useMutation({
+    mutationFn: myRequestsApi.acceptRequest,
+
+    onSuccess: async (data) => {
+      console.log(data);
+
+      try {
+        await mineMutation.mutateAsync();
+        //* Invalidate and refetch the profile data
+        queryClient.invalidateQueries({ queryKey: ["my-requests"] });
+        toast.success("Request was accepted");
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        toast.error("Mining operation failed");
+      }
+    },
+    onError: (error: AxiosError<{ error?: string }>) => {
+      console.log(error);
+      const errorMessage =
+        error.response?.data?.error || "Failed to accept request";
+
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useRejectRequest = () => {
+  const queryClient = useQueryClient();
+  const mineMutation = useMine();
+
+  return useMutation({
+    mutationFn: myRequestsApi.rejectRequest,
+
+    onSuccess: async (data) => {
+      console.log(data);
+
+      try {
+        await mineMutation.mutateAsync();
+        //* Invalidate and refetch the profile data
+        queryClient.invalidateQueries({ queryKey: ["my-requests"] });
+        toast.success("Request was rejected");
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        toast.error("Mining operation failed");
+      }
+    },
+    onError: (error: AxiosError<{ error?: string }>) => {
+      console.log(error);
+      const errorMessage =
+        error.response?.data?.error || "Failed to reject request";
+
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useCompleteRequest = () => {
+  const queryClient = useQueryClient();
+  const mineMutation = useMine();
+
+  return useMutation({
+    mutationFn: myRequestsApi.completeRequest,
+
+    onSuccess: async (data) => {
+      console.log(data);
+
+      try {
+        await mineMutation.mutateAsync();
+        //* Invalidate and refetch the profile data
+        queryClient.invalidateQueries({ queryKey: ["my-requests"] });
+        toast.success("Request has been completed");
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        toast.error("Mining operation failed");
+      }
+    },
+    onError: (error: AxiosError<{ error?: string }>) => {
+      console.log(error);
+      const errorMessage =
+        error.response?.data?.error || "Failed to complete request";
+
       toast.error(errorMessage);
     },
   });
