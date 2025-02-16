@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import DashboardLayout from "@/pages/dashboard/dashboard-layout";
 import Sidebar from "@/components/sidebar";
