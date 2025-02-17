@@ -15,6 +15,7 @@ import {
 import DashboardHeader from "../dashboard-header";
 import {
   useAcceptOffers,
+  useCompleteOffers,
   useGetMyOffers,
   useRejectOffers,
 } from "@/hooks/my-offers";
@@ -30,17 +31,19 @@ export default function MyOffers() {
       accepting: boolean;
       rejecting: boolean;
       deleting: boolean;
+      completing: boolean;
     };
   }>({});
   const deleteCourse = useDeleteCourse();
   const acceptOffer = useAcceptOffers();
+  const completeOffer = useCompleteOffers();
   const rejectOffer = useRejectOffers();
 
   const { data: myOffers } = useGetMyOffers();
 
   const updateLoadingState = (
     requestId: string,
-    key: "rejecting" | "accepting" | "deleting",
+    key: "rejecting" | "accepting" | "deleting" | "completing",
     value: boolean
   ) => {
     setLoadingStates((prev) => ({
@@ -59,6 +62,16 @@ export default function MyOffers() {
       acceptOffer.mutateAsync(requestId);
     } finally {
       updateLoadingState(requestId, "accepting", false);
+    }
+  };
+
+  const handleCompleteOffer = (requestId: string) => {
+    updateLoadingState(requestId, "completing", true);
+
+    try {
+      completeOffer.mutateAsync(requestId);
+    } finally {
+      updateLoadingState(requestId, "completing", false);
     }
   };
 
@@ -189,11 +202,18 @@ export default function MyOffers() {
                                   loadingStates[request.requestid]?.rejecting ||
                                   false
                                 }
+                                onCompleteIsPendingCheck={
+                                  loadingStates[request.requestid]
+                                    ?.completing || false
+                                }
                                 onAccept={() =>
                                   handleAcceptOffer(request.requestid)
                                 }
                                 onReject={() =>
                                   handleRejectOffer(request.requestid)
+                                }
+                                onComplete={() =>
+                                  handleCompleteOffer(request.requestid)
                                 }
                               />
                             </TableCell>
@@ -259,11 +279,18 @@ export default function MyOffers() {
                               loadingStates[request.requestid]?.rejecting ||
                               false
                             }
+                            onCompleteIsPendingCheck={
+                              loadingStates[request.requestid]?.completing ||
+                              false
+                            }
                             onAccept={() =>
                               handleAcceptOffer(request.requestid)
                             }
                             onReject={() =>
                               handleRejectOffer(request.requestid)
+                            }
+                            onComplete={() =>
+                              handleCompleteOffer(request.requestid)
                             }
                           />
                         </div>

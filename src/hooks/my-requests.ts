@@ -2,11 +2,11 @@ import { myRequestsApi } from "@/api/my-requests";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
-// import { useMine } from "./mine";
+import { useMine } from "./mine";
 
 export const useCreateCourseRequest = () => {
   const queryClient = useQueryClient();
-  // const mineMutation = useMine();
+  const mineMutation = useMine();
 
   return useMutation({
     mutationFn: myRequestsApi.createCourseRequest,
@@ -15,7 +15,7 @@ export const useCreateCourseRequest = () => {
       console.log(data);
 
       try {
-        // await mineMutation.mutateAsync();
+        await mineMutation.mutateAsync();
         //* Invalidate and refetch the profile data
         queryClient.invalidateQueries({ queryKey: ["my-requests"] });
         toast.success("Request was made successfully");

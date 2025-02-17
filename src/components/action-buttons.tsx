@@ -7,15 +7,17 @@ interface ActionButtonsProps {
   onComplete?: () => void;
   onAcceptIsPendingCheck: boolean;
   onRejectIsPendingCheck: boolean;
-  onCompleteIsPendingCheck?: boolean;
+  onCompleteIsPendingCheck: boolean;
 }
 
 export default function ActionButtons({
   status,
   onAccept,
   onReject,
+  onComplete,
   onAcceptIsPendingCheck,
   onRejectIsPendingCheck,
+  onCompleteIsPendingCheck,
 }: ActionButtonsProps) {
   if (status === "pending") {
     return (
@@ -53,14 +55,15 @@ export default function ActionButtons({
   //   );
   // }
 
-  if (status === "completed") {
+  if (status === "accepted") {
     return (
       <Button
-        disabled
+        disabled={onCompleteIsPendingCheck}
+        onClick={onComplete}
         size="sm"
         className="bg-gray-200 text-gray-700 hover:bg-gray-300 h-7 px-4"
       >
-        complete
+        {onCompleteIsPendingCheck ? "Completing..." : "Complete"}
       </Button>
     );
   }
