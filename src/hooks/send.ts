@@ -9,8 +9,7 @@ export const useSend = () => {
   return useMutation({
     mutationFn: sendApi.sendFunds,
 
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       toast.success("Amount sent successfully");
 
       //* Invalidate and refetch the profile data

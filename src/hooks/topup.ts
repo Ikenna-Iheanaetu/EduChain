@@ -2,11 +2,11 @@ import { topUpApi } from "@/api/topup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
-import { useMine } from "./mine";
+// import { useMine } from "./mine";
 
 export const useTopUp = () => {
   const queryClient = useQueryClient();
-  const mineMutation = useMine();
+  // const mineMutation = useMine();
 
   return useMutation({
     mutationFn: topUpApi.topUpAmount,
@@ -15,7 +15,7 @@ export const useTopUp = () => {
       console.log(data);
 
       try {
-        await mineMutation.mutateAsync();
+        // await mineMutation.mutateAsync();
 
         //* Invalidate and refetch the profile data
         queryClient.invalidateQueries({ queryKey: ["profile"] });

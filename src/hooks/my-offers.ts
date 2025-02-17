@@ -2,7 +2,7 @@ import { myOffersApi } from "@/api/my-offers";
 import { Offers } from "@/types/my-offers.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useMine } from "./mine";
+// import { useMine } from "./mine";
 import { toast } from "sonner";
 
 export const useGetMyOffers = () => {
@@ -16,7 +16,7 @@ export const useGetMyOffers = () => {
 
 export const useAcceptOffers = () => {
   const queryClient = useQueryClient();
-  const mineMutation = useMine();
+  // const mineMutation = useMine();
 
   return useMutation({
     mutationFn: myOffersApi.acceptOffer,
@@ -25,7 +25,7 @@ export const useAcceptOffers = () => {
       console.log(data);
 
       try {
-        await mineMutation.mutateAsync();
+        // await mineMutation.mutateAsync();
         //* Invalidate and refetch the profile data
         queryClient.invalidateQueries({ queryKey: ["my-requests"] });
         toast.success("Request was accepted");
@@ -46,7 +46,7 @@ export const useAcceptOffers = () => {
 
 export const useRejectOffers = () => {
   const queryClient = useQueryClient();
-  const mineMutation = useMine();
+  // const mineMutation = useMine();
 
   return useMutation({
     mutationFn: myOffersApi.rejectOffer,
@@ -55,7 +55,7 @@ export const useRejectOffers = () => {
       console.log(data);
 
       try {
-        await mineMutation.mutateAsync();
+        // await mineMutation.mutateAsync();
         //* Invalidate and refetch the profile data
         queryClient.invalidateQueries({ queryKey: ["my-requests"] });
         toast.success("Request was rejected");
@@ -76,7 +76,7 @@ export const useRejectOffers = () => {
 
 export const useCompleteOffers = () => {
   const queryClient = useQueryClient();
-  const mineMutation = useMine();
+  // const mineMutation = useMine();
 
   return useMutation({
     mutationFn: myOffersApi.completeOffer,
@@ -85,7 +85,7 @@ export const useCompleteOffers = () => {
       console.log(data);
 
       try {
-        await mineMutation.mutateAsync();
+        // await mineMutation.mutateAsync();
         //* Invalidate and refetch the profile data
         queryClient.invalidateQueries({ queryKey: ["my-requests"] });
         toast.success("Request has been completed");
