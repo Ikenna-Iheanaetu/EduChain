@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,16 +8,12 @@ import Sidebar from "@/components/sidebar";
 import { cn } from "@/lib/utils";
 import ChatView from "./chat-view";
 import MessageList from "./message-list";
-import { useGetMessageContacts } from "@/hooks/messages";
-
-interface Message {
-  id: string;
-  content: string;
-  sender: string;
-  timestamp: string;
-  avatar: string;
-  isSender: boolean;
-}
+import { useGetMessageContacts, useSendMessage } from "@/hooks/messages";
+import { messagesApi } from "@/api/messages";
+import { toast } from "sonner";
+import { pickAnImage } from "@/lib/pick-image";
+import { format } from "date-fns";
+import { useProfile } from "@/hooks/profile";
 
 interface Conversation {
   id: string;
@@ -29,79 +23,98 @@ interface Conversation {
   timestamp: string;
 }
 
-// Mock data
-const conversations: Conversation[] = [
-  {
-    id: "1",
-    name: "Elmer Laverty",
-    lastMessage: "Haha oh man 😅",
-    avatar: "/placeholder.svg",
-    timestamp: "12m",
-  },
-  {
-    id: "2",
-    name: "Florencio Dorrance",
-    lastMessage: "woohoooo",
-    avatar: "/placeholder.svg",
-    timestamp: "24m",
-  },
-  {
-    id: "3",
-    name: "Lavern Laboy",
-    lastMessage: "Haha that's terrifying 😅",
-    avatar: "/placeholder.svg",
-    timestamp: "1h",
-  },
-  // Add more conversations...
-];
-
-const messages: Message[] = [
-  {
-    id: "1",
-    content: "omg, this is amazing",
-    sender: "Florencio",
-    timestamp: "12:30 PM",
-    avatar: "/placeholder.svg",
-    isSender: false,
-  },
-  {
-    id: "2",
-    content: "perfect! ✅",
-    sender: "You",
-    timestamp: "12:31 PM",
-    avatar: "/placeholder.svg",
-    isSender: true,
-  },
-  {
-    id: "3",
-    content: "Wow, this is really epic",
-    sender: "Florencio",
-    timestamp: "12:32 PM",
-    avatar: "/placeholder.svg",
-    isSender: false,
-  },
-  // Add more messages...
-];
+interface Message {
+  content: string;
+  created_at: string;
+  is_read: boolean;
+  messageid: string;
+  receiverid: string;
+  request_id: string;
+  senderid: string;
+}
 
 export default function Messages() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation | null>(null);
   const [messageInput, setMessageInput] = useState("");
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const sendMessageMutation = useSendMessage();
+  const { data: profile } = useProfile();
 
-  const { data: contacts } = useGetMessageContacts()
-  console.log(contacts)
+  const { data: contacts, isLoading: isLoadingContacts } =
+    useGetMessageContacts();
+
+  const handleSelectingContact = async (requestId: string) => {
+    setIsLoading(true);
+
+    try {
+      const selectedContact = contacts?.find(
+        (contact) => contact.request_id === requestId
+      );
+
+      if (selectedContact) {
+        setSelectedConversation({
+          id: requestId,
+          name: `${selectedContact.firstname} ${selectedContact.lastname}`,
+          lastMessage: "Loading...",
+          avatar: pickAnImage(selectedContact.avatar_number) || "",
+          timestamp: format(
+            new Date(selectedContact.course.creation_date),
+            "PPpp"
+          ),
+        });
+
+        const messagesData = await messagesApi.getMessagesForContact(requestId);
+        console.log(messagesData);
+        setMessages(messagesData || []);
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      toast.error("Failed to fetch messages");
+      setMessages([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageInput.trim() || !selectedConversation) return;
+
+    try {
+      const selectedContact = contacts?.find(
+        (contact) => contact.request_id === selectedConversation.id
+      );
+
+      if (!selectedContact) {
+        toast.error("Could not find contact information");
+        return;
+      }
+
+      const messageData = {
+        receiver_id: selectedContact.userid,
+        content: messageInput,
+        request_id: selectedConversation.id,
+      };
+
+      await sendMessageMutation.mutateAsync(messageData);
+      setMessageInput("");
+
+      const updatedMessages = await messagesApi.getMessagesForContact(
+        selectedConversation.id
+      );
+      setMessages(updatedMessages || []);
+    } catch (error) {
+      console.error("Error in send message:", error);
+      toast.error("Failed to send message");
+    }
+  };
 
   const handleBack = () => {
     setSelectedConversation(null);
+    setMessages([]);
   };
-
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-    }
-  }, []);
 
   return (
     <DashboardLayout>
@@ -123,7 +136,6 @@ export default function Messages() {
               : "translate-x-0"
           )}
         >
-          {/* Header */}
           <div className="p-4 border-b">
             <div className="flex items-center gap-4">
               <Button
@@ -144,11 +156,19 @@ export default function Messages() {
             </div>
           </div>
 
-          {/* Message List */}
-         <MessageList conversations={conversations} selectedConversation={selectedConversation} setSelectedConversation={setSelectedConversation} />
+          {isLoadingContacts ? (
+            <div className="flex-1 flex items-center justify-center p-4">
+              <span className="text-gray-500">Loading contacts...</span>
+            </div>
+          ) : (
+            <MessageList
+              contacts={contacts || []}
+              selectContact={handleSelectingContact}
+              setSelectedConversation={setSelectedConversation}
+            />
+          )}
         </div>
 
-        {/* Chat View */}
         <div
           className={cn(
             "absolute inset-0 md:relative md:flex flex-1 flex-col bg-white transition-transform duration-300 md:translate-x-0",
@@ -158,14 +178,23 @@ export default function Messages() {
           )}
         >
           {selectedConversation ? (
-            <ChatView
-              selectedConversation={selectedConversation}
-              messages={messages}
-              messageInput={messageInput}
-              setMessageInput={setMessageInput}
-              scrollAreaRef={scrollAreaRef}
-              handleBack={() => handleBack()}
-            />
+            <>
+              <ChatView
+                selectedConversation={selectedConversation}
+                messages={messages}
+                messageInput={messageInput}
+                setMessageInput={setMessageInput}
+                handleBack={handleBack}
+                handleSendMessage={handleSendMessage}
+                currentUserId={profile?.userid || ''} // Pass the current user's ID
+                currentUserAvatar={profile?.avatar_number || 1 } 
+              />
+              {isLoading && (
+                <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                  <span className="text-gray-500">Loading messages...</span>
+                </div>
+              )}
+            </>
           ) : (
             <div className="hidden md:flex flex-1 items-center justify-center text-gray-500">
               Select a conversation to start messaging
