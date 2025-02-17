@@ -18,7 +18,7 @@ interface Student {
 
 export interface Offers {
   complete_count: number;
-  course: Course;
+  course?: Course;
   courseid: string;
   created_at: string;
   requestid: string;

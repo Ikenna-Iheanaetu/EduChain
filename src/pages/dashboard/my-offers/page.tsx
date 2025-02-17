@@ -83,6 +83,8 @@ export default function MyOffers() {
 
   const offers = myOffers || [];
 
+  console.log(offers);
+
   return (
     <DashboardLayout>
       <div className="hidden lg:block">
@@ -108,11 +110,11 @@ export default function MyOffers() {
               <ServiceCard
                 key={index}
                 courseId={offer.courseid}
-                title={offer.course.course_name}
-                author={offer.course.tutor_name}
-                authorId={offer.course.tutor_id}
-                price={`${offer.course.duration} VC`} // Assuming price is based on duration
-                duration={`${offer.course.duration} hours`}
+                title={offer.course?.course_name || "Course Name"}
+                author={offer.course?.tutor_name}
+                authorId={offer.course?.tutor_id}
+                price={`${offer.course?.duration} VC`} // Assuming price is based on duration
+                duration={`${offer.course?.duration} hours`}
                 mode="offer"
                 variant={
                   index % 3 === 0 ? "blue" : index % 3 === 1 ? "mint" : "blue"
@@ -130,7 +132,7 @@ export default function MyOffers() {
           {selectedOffer !== null && (
             <div className="mt-8">
               <h2 className="text-xl font-semibold mb-6">
-                {offers[selectedOffer].course.course_name}
+                {offers[selectedOffer]?.course?.course_name || "Course Name"}
               </h2>
 
               {/* Desktop Table View */}
@@ -150,7 +152,7 @@ export default function MyOffers() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {offers[selectedOffer].course.total_requests > 0 ? (
+                    {offers[selectedOffer]?.course?.total_requests ?? 0 > 0 ? (
                       offers
                         .filter(
                           (offer) =>
@@ -169,7 +171,7 @@ export default function MyOffers() {
                                 </p>
                               </div>
                             </TableCell>
-                            <TableCell>{`${request.course.duration} VC`}</TableCell>
+                            <TableCell>{`${request.course?.duration} VC`}</TableCell>
                             <TableCell>
                               {format(request.created_at, "PPpp")}
                             </TableCell>
@@ -234,7 +236,7 @@ export default function MyOffers() {
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
                           <p className="text-gray-500">Price</p>
-                          <p className="font-medium">{`${request.course.duration} VC`}</p>
+                          <p className="font-medium">{request?.course?.duration ? `${request.course.duration} VC` : 'N/A'}</p>
                         </div>
                         <div>
                           <p className="text-gray-500">Date & Time</p>
