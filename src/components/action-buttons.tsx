@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 
 interface ActionButtonsProps {
   status: "pending" | "accepted" | "completed";
-  onAccept?: () => void;
-  onReject?: () => void;
-  onComplete?: () => void;
+  onAccept: () => void;
+  onReject: () => void;
+  onComplete: () => void;
   onAcceptIsPendingCheck: boolean;
   onRejectIsPendingCheck: boolean;
   onCompleteIsPendingCheck: boolean;
