@@ -236,7 +236,11 @@ export default function MyOffers() {
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
                           <p className="text-gray-500">Price</p>
-                          <p className="font-medium">{request?.course?.duration ? `${request.course.duration} VC` : 'N/A'}</p>
+                          <p className="font-medium">
+                            {request?.course?.duration
+                              ? `${request.course.duration} VC`
+                              : "N/A"}
+                          </p>
                         </div>
                         <div>
                           <p className="text-gray-500">Date & Time</p>
