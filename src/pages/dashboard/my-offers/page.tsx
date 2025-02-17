@@ -29,6 +29,7 @@ export default function MyOffers() {
     [key: string]: {
       accepting: boolean;
       rejecting: boolean;
+      deleting: boolean;
     };
   }>({});
   const deleteCourse = useDeleteCourse();
@@ -39,7 +40,7 @@ export default function MyOffers() {
 
   const updateLoadingState = (
     requestId: string,
-    key: "rejecting" | "accepting",
+    key: "rejecting" | "accepting" | "deleting",
     value: boolean
   ) => {
     setLoadingStates((prev) => ({
@@ -72,7 +73,12 @@ export default function MyOffers() {
   };
 
   const handleDeleteCourse = (courseId: string) => {
-    deleteCourse.mutateAsync(courseId);
+    updateLoadingState(courseId, "deleting", true);
+    try {
+      deleteCourse.mutateAsync(courseId);
+    } finally {
+      updateLoadingState(courseId, "deleting", false);
+    }
   };
 
   const offers = myOffers || [];
@@ -113,7 +119,9 @@ export default function MyOffers() {
                 }
                 onAction={() => setSelectedOffer(index)}
                 onDelete={() => handleDeleteCourse(offer.courseid)}
-                isDeletingCheck={deleteCourse.status === "pending"}
+                isDeletingCheck={
+                  loadingStates[offer.courseid]?.deleting || false
+                }
               />
             ))}
           </div>
