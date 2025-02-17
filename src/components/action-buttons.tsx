@@ -61,7 +61,7 @@ export default function ActionButtons({
         disabled={onCompleteIsPendingCheck}
         onClick={onComplete}
         size="sm"
-        className="bg-gray-200 text-gray-700 hover:bg-gray-300 h-7 px-4"
+        className="bg-[#0095FF] hover:bg-blue-600 text-white h-7 px-4"
       >
         {onCompleteIsPendingCheck ? "Completing..." : "Complete"}
       </Button>
